@@ -10,8 +10,8 @@ find=n=>n&&D.find(x=>nz(x.n).includes(nz(n))||nz(n).includes(nz(x.n))),
 cur=()=>S.dest&&(find(S.dest)||{id:"g",n:S.dest,t:"",c:S.cost||(S.mode=="intl"?2800:1600),k:S.dest.replace(/ /g,"_")}),
 nts=()=>S.days||3,used=()=>(S.hotel?.p||0)*nts()+(S.flight?.p||0),
 HN=["Casa del Sol","Hotel Brisa","Posada Real","Gran Marina","Villa Azul","Hotel Centro"],FI=["Aeroméxico","United","American","Iberia","Air France","LATAM"],FN=["Volaris","Aeroméxico","Viva","Calafia","Magni","TAR"],
-ht=d=>[0,1,2].map(k=>{const i=(S.ofs*3+k)%6,n=`${HN[i]} ${d.n.split(" ")[0]}`;return{n,st:3+i%3,p:Math.round(d.c*[.45,.75,1.1][i%3]*(1+H(n)%20/100)/50)*50}}),
-fl=d=>{const i=S.mode=="intl";return[0,1,2].map(k=>{const a=(i?FI:FN)[(S.ofs*3+k)%6];return{a,p:(i?7500:1800)+H(a+d.id)%(i?14000:3200),h:`${6+H(a)%14}:${["00","15","30","45"][H(a+"m")%4]}`}})},
+ht=d=>[0,1,2].map(k=>{const i=(S.ofs*3+k)%6,n=`${HN[i]} ${d.n}`;return{n,st:3+i%3,p:Math.round(d.c*[.45,.75,1.1][i%3]*(1+H(n)%20/100)/50)*50}}),
+fl=d=>{const i=S.mode=="intl";return[0,1,2].map(k=>{const a=(i?FI:FN)[(S.ofs*3+k)%6];return{a,p:(i?7500:1800)+H(a+d.n)%(i?14000:3200),h:`${6+H(a+d.n)%14}:${["00","15","30","45"][H(a+"m")%4]}`}})},
 lab=(v,f)=>!v?"Pendiente":v=="n"?"No necesario 😄":v=="x"?"Por tu cuenta":esc(v[f]);
 
 // ---------- UI ----------
@@ -19,17 +19,19 @@ const add=(c,h)=>{const e=document.createElement("div");e.className=c;e.innerHTM
 function say(t,me){const d=document.createElement("div");d.className="m"+(me?" me":"");d.textContent=t;d.dataset.t=new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});M.append(d);M.scrollTop=1e9}
 const bot=t=>{say(t);S.hist.push({r:"m",t})},
 chips=a=>{M.querySelectorAll(".chips").forEach(e=>e.remove());add("chips",a.map(x=>`<button>${esc(x)}</button>`).join(""))},
-WK={};
-async function pic(el){const{w,q}=el.dataset;let u;try{
- if(q)u=await(WK[q]??=fetch(`https://es.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(q)}&gsrlimit=1&prop=pageimages&piprop=thumbnail&pithumbsize=480&format=json&origin=*`).then(r=>r.json()).then(j=>Object.values(j.query?.pages||{})[0]?.thumbnail?.source));
+WK={},UP={},
+ph=async q=>{try{const u=bg.auth.currentUser;if(!u)return null;const r=await(await fetch("/api/photo",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({token:await u.getIdToken(),q})})).json();return r.url?r:null}catch{return null}};
+async function pic(el){const{w,q,img}=el.dataset;let u,cr;try{
+ if(img)u=img;else{const k=q||(w||"").replace(/_/g," ");if(k){const r=await(UP[k]??=ph(k));if(r?.url){u=r.url;cr=r}}}
+ if(!u&&q)u=await(WK[q]??=fetch(`https://es.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(q)}&gsrlimit=1&prop=pageimages&piprop=thumbnail&pithumbsize=480&format=json&origin=*`).then(r=>r.json()).then(j=>Object.values(j.query?.pages||{})[0]?.thumbnail?.source));
  if(!u&&w)u=await(WK[w]??=fetch("https://es.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(w)).then(r=>r.json()).then(j=>j.thumbnail?.source));
- u&&el.insertAdjacentHTML("afterbegin",`<img src="${u}" alt="">`)}catch{}}
-const cards=a=>{const e=add("cards",a.map(x=>`<div class="cc"><div class="im" data-w="${esc(x.w||"")}" data-q="${esc(x.q||"")}"><i>${x.e||"🌎"}</i>${x.p!=null?`<b>${mx(x.p)}${x.pl||""}</b>`:""}</div><div class="bd"><h4>${esc(x.t)}</h4><p>${esc(x.s)}</p><div class="bt2">${x.btn.map(([l,a,i])=>`<button data-a="${a}" data-id="${esc(i)}">${l}</button>`).join("")}</div></div></div>`).join(""));e.querySelectorAll(".im").forEach(pic)};
+ u&&el.insertAdjacentHTML("afterbegin",`<img src="${esc(u)}" alt="">`+(cr?`<small style="position:absolute;left:6px;bottom:4px;z-index:1;font-size:10px;background:#000a;color:#fff;padding:1px 6px;border-radius:6px">📷 <a style="color:#fff" href="${esc(cr.link||"https://unsplash.com")}?utm_source=bookandgo&utm_medium=referral" target="_blank" rel="noopener">${esc(cr.name||"Unsplash")}</a> · <a style="color:#fff" href="https://unsplash.com/?utm_source=bookandgo&utm_medium=referral" target="_blank" rel="noopener">Unsplash</a></small>`:""))}catch{}}
+const cards=a=>{const e=add("cards",a.map(x=>`<div class="cc"><div class="im" data-w="${esc(x.w||"")}" data-q="${esc(x.q||"")}" data-img="${esc(x.img||"")}"><i>${x.e||"🌎"}</i>${x.p!=null?`<b>${mx(x.p)}${x.pl||""}</b>`:""}</div><div class="bd"><h4>${esc(x.t)}</h4><p>${esc(x.s)}</p>${x.d?.length?`<ul style="margin:4px 0 0;padding-left:16px;font-size:12px;color:var(--muted)">${x.d.map(l=>`<li style="margin-bottom:4px">${esc(l)}</li>`).join("")}</ul>`:""}<div class="bt2">${x.btn.map(([l,a,i])=>`<button data-a="${a}" data-id="${esc(i)}">${l}</button>`).join("")}</div></div></div>`).join(""));e.querySelectorAll(".im").forEach(pic)};
 function sync(){$("td").textContent=S.dest||"Sin destino";$("tb").textContent=S.budget!=null?mx(S.budget):"Por definir";let t=$("tp");if(!t){t=document.createElement("div");t.id="tp";$("tb").parentNode.append(t)}
  t.innerHTML=`<br>🧳 ${S.days||"—"} días · desde ${esc(S.origin||"—")}<br>🏨 ${lab(S.hotel,"n")}<br>✈️ ${lab(S.flight,"a")}<br>💸 Restante: ${S.budget!=null?mx(S.budget-used()):"—"}`}
 function save(){const u=window.bg?.auth.currentUser;if(!u)return;const s={};[...K,"mode","cost","home"].forEach(k=>s[k]=S[k]??null);
  bg.set(bg.ref(bg.db,"chats/"+u.uid),JSON.parse(JSON.stringify({m:S.hist.slice(-20),s}))).catch(()=>{})}
-function set(k,v){if(k=="dest"&&S.dest&&nz(S.dest)!=nz(v))S.hotel=S.flight=S.plan=S.mode=S.pp=0;S[k]=v;S.done=0;sync()}
+function set(k,v){if(k=="dest"&&S.dest&&nz(S.dest)!=nz(v))S.hotel=S.flight=S.plan=S.mode=S.pp=S.cc=0;if(/^(dest|days|origin)$/.test(k))S.rc=0;S[k]=v;S.done=0;sync()}
 
 const RS=()=>{K.forEach(k=>S[k]=0);S.budget=null;S.mode=S.cost=S.pp=S.done=S.askHome=0};
 // ---------- Flujo del viaje (no estricto: siempre sabe qué falta) ----------
@@ -49,16 +51,33 @@ const AP=o=>/cdmx|ciudad de m[eé]xico|mexico city|df\b/i.test(o)?"Aeropuerto In
 route=(d,t)=>{const h=S.home&&S.home!="gps"?S.home:"",o=h?`&origin=${encodeURIComponent(h)}`:"";add("it",`<div><b>🗺️ ${esc(t)}</b><span>Desde ${h?esc(h):"tu ubicación actual"} (Google Maps)</span></div><div class="ln">${[["🚇 Transporte","transit"],["🚗 Auto","driving"],["🚶 A pie","walking"]].map(([l,m])=>`<a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(d)}${o}&travelmode=${m}" target="_blank" rel="noopener">${l}</a>`).join("")}</div>`)};
 function goRoute(){if(!S.dest){bot("Primero dime a dónde quieres ir 🌎");return}
  if(!S.home){S.askHome=1;bot("🏠 ¿Desde dónde sales? Escríbeme tu colonia o dirección (ej. \"Col. Juárez, CDMX\") o usa tu ubicación actual 👇");chips(["📡 Usar mi ubicación actual"]);return 0}
- if(S.flight?.a||/fly|intl/.test(S.mode)){const h=S.flight?.h,e=S.mode=="intl"?3:2;let a="";if(h){const[x,y]=h.split(":").map(Number),t=(x*60+y-e*60+1440)%1440;a=` (≈ ${t/60|0}:${String(t%60).padStart(2,"0")})`}
+ const air=S.flight?.a||S.flight=="x"||/fly|intl/.test(S.mode),land=/local|road/.test(S.mode)||S.flight=="n";
+ if(!air&&!land){bot("¿Cómo viajarás a "+S.dest+"? Así te muestro la ruta correcta 👇");chips(["✈️ Voy en avión","🚗 Voy por tierra"]);return 0}
+ if(air){const h=S.flight?.h,e=S.mode=="intl"?3:2;let a="";if(h){const[x,y]=h.split(":").map(Number),t=(x*60+y-e*60+1440)%1440;a=` (≈ ${t/60|0}:${String(t%60).padStart(2,"0")})`}
   bot(`Llega al aeropuerto ${e} h antes de tu vuelo${h?` de las ${h}`:""}${a}. Así llegas 👇`);route(AP(S.origin),"Ruta a tu aeropuerto")}
  else{bot(`Así llegas a ${S.dest} 👇`);route(S.dest,"Ruta a "+S.dest)}}
 function mode(){const m=S.mode;S.done=0;
  if(/local|road/.test(m)){if(!S.flight)S.flight="n";if(m=="local"){if(!S.hotel)S.hotel="n";if(!S.days)S.days=1}goRoute()}
  if(m=="intl"&&!S.pp){S.pp=1;bot("🛂 Es un viaje internacional: revisa que tu pasaporte esté vigente y los requisitos de entrada (visa, seguro) del país.")}sync()}
-function showOpts(k){const d=cur();if(!d){bot("Primero dime a dónde quieres ir 🌎");return fin()}
- sh=k;const l=(k=="hotel"?ht:fl)(d);S.opt={k,l};
- cards(l.map((o,i)=>k=="hotel"?{w:d.k,e:"🏨",t:o.n,s:`${"★".repeat(o.st)} · ${nts()} noches = ${mx(o.p*nts())}`,p:o.p,pl:"/noche",btn:[["✅ Elegir","sh",i]]}:{e:"✈️",t:o.a,s:`${S.origin||"Tu ciudad"} → ${d.n} · ${o.h} · ${S.mode=="intl"?"internacional":"directo"}`,p:o.p,pl:" redondo",btn:[["✅ Elegir","sh",i]]}));chips(["🔄 Ver otras opciones"])}
-function showPlan(){sh="plan";const d=cur();cards(S.plan.map((x,i)=>({w:d?.k,q:`${x.p} ${S.dest}`,e:"📅",t:`Día ${i+1}`,s:x.t,btn:[["✏️ Cambiar","chg",i]]})));chips(["👍 Me gusta","🔁 Otras ideas"])}
+const IA={pv:"PVR",cun:"CUN",oax:"OAX",sc:"TGZ",gto:"BJX",tul:"TQO",bac:"CTM",cdmx:"MEX",mty:"MTY",lap:"LAP"},
+oi=o=>{o=nz(o||"");return/cdmx|ciudad de mexico|neza|\bdf\b/.test(o)?"MEX":/guadalajara/.test(o)?"GDL":/monterrey/.test(o)?"MTY":/puebla/.test(o)?"PBC":""},
+fd=s=>new Date(s+"T12:00").toLocaleDateString("es-MX",{day:"numeric",month:"short"});
+async function real(k,d){try{const u=bg.auth.currentUser;if(!u)return null;
+ const r=await(await fetch("/api/"+(k=="hotel"?"hotels":"flights"),{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({token:await u.getIdToken(),dest:d.n,origin:S.origin||"Ciudad de México",days:nts(),cc:find(d.n)?"MX":S.cc||"",dc:IA[d.id]||"",oc:oi(S.origin)})})).json();
+ if(r.err)console.warn("API "+k+":",r.err);return r.items?.length?r:null}catch(e){console.warn(e);return null}}
+async function showOpts(k){const d=cur();if(!d){bot("Primero dime a dónde quieres ir 🌎");return fin()}
+ sh=k;S.rc||={};let L=S.rc[k];
+ if(L===undefined){const w=add("m dots","<span></span><span></span><span></span>");L=S.rc[k]=await real(k,d);w.remove()}
+ let l;if(L?.items?.length){const n=L.items.length,s=(S.ofs*3)%n;l=[...L.items,...L.items].slice(s,s+3).slice(0,n)}else l=(k=="hotel"?ht:fl)(d);
+ S.opt={k,l};
+ cards(l.map((o,i)=>k=="hotel"?{w:d.k,img:o.img,e:"🏨",t:o.n,s:`${"★".repeat(o.st)} · ${nts()} noches = ${mx(o.p*nts())}`,p:o.p,pl:"/noche",btn:[["✅ Elegir","sh",i]]}:{e:"✈️",t:o.a,s:`${S.origin||"Tu ciudad"} → ${d.n} · ${o.h||""} · ${o.st==null?(S.mode=="intl"?"internacional":"directo"):o.st?o.st+" escala"+(o.st>1?"s":""):"directo"}`,p:o.p,pl:" redondo",btn:[["✅ Elegir","sh",i]]}));
+ say(!L?.items?.length?"ℹ️ Mostrando datos de ejemplo (no pude consultar precios reales ahora).":k=="hotel"?(L.sandbox?"🏨 Datos de prueba de LiteAPI (sandbox): los precios no son reales todavía.":`🏨 Tarifas de LiteAPI para ${fd(L.dep)} – ${fd(L.out)} (2 adultos). Cambian según la fecha.`):`✈️ Precios reales de ${L.src} para salir el ${fd(L.dep)} y volver el ${fd(L.ret)}, 1 persona. Cambian según la fecha.`);
+ chips(["🔄 Ver otras opciones"])}
+function showPlan(){sh="plan";const d=cur();
+ cards(S.plan.map((x,i)=>({w:d?.k,q:`${x.p} ${S.dest}`,e:"📅",t:`Día ${i+1}`+(x.m?`: ${x.t}`:""),s:x.m?(x.c!=null?`≈ ${mx(x.c)} ese día`:""):x.t,d:[x.m&&"🌅 "+x.m,x.a&&"☀️ "+x.a,x.n&&"🌙 "+x.n].filter(Boolean),btn:[["✏️ Cambiar","chg",i]]})));
+ if(S.plan.some(x=>x.c!=null)){const tot=S.plan.reduce((a,x)=>a+(+x.c||0),0),rest=S.budget!=null?Math.max(S.budget-used(),0):null;
+  say(`💸 Comidas, entradas y transporte local estimados: ${mx(tot)}`+(rest!=null?` de ${mx(rest)} que te sobran ${tot<=rest?"✅":"⚠️"}`:""))}
+ chips(["👍 Me gusta","🔁 Otras ideas"])}
 const dc=d=>({w:d.k,e:"📍",t:d.n,s:(S.budget?`≈ ${mx(d.c*nts())} por ${nts()} días · `:"")+d.t.split(" ").join(" · "),p:d.c,pl:"/día",btn:[["✅ Elegir","pick",d.id]]});
 function sug(m,b){sh="dest";let l=b?[...D].sort((a,c)=>a.c-c.c):D.filter(x=>(!m||x.t.includes(m.slice(0,6)))&&(!S.budget||x.c*nts()<=S.budget));if(!l.length)l=[...D].sort((a,c)=>a.c-c.c);cards(l.slice(0,4).map(dc))}
 
@@ -68,10 +87,13 @@ function local(t){const n=nz(t),s=t.length<40,m=mood(t);let x;if(!s||/internacio
  if(/^\$?\s?0$|^(gratis|nada|cero)$/.test(n))return()=>set("budget",0);
  if(x=t.match(/\$\s?([\d,]{3,})/))return()=>set("budget",+x[1].replace(/,/g,""));
  if(x=n.match(/^(\d{1,2}) dias?$/))return()=>set("days",+x[1]);
+ if(x=n.match(/^(\d{1,2}|una?|dos) semanas?$/))return()=>set("days",7*({un:1,una:1,dos:2}[x[1]]||+x[1]));
  if(x=t.match(/^📍\s*(.+)$/u))return()=>set("origin",x[1]);
  if(/^(ya tengo|omitir) (hotel|vuelo)/.test(n))return()=>set(/hotel/.test(n)?"hotel":"flight","x");
  if(n=="mas tarde")return()=>set("plan","x");
  if(/ver (hoteles|vuelos|recomendados)$/.test(n))return()=>showOpts(/vuelos/.test(n)?"flight":"hotel");
+ if(/voy en avion/.test(n))return()=>{S.mode="fly";sync();return goRoute()};
+ if(/voy por tierra/.test(n))return()=>{S.mode="road";if(!S.flight)S.flight="n";sync();return goRoute()};
  if(/como llegar|llegar al aeropuerto/.test(n))return goRoute;
  if(/otras opciones/.test(n))return()=>{S.ofs++;showOpts(S.opt?.k||"hotel")};
  if(/cambiar algo/.test(n))return()=>{bot("Dime qué quieres cambiar: hotel, vuelo, destino, días o presupuesto 😉");chips(["🏨 Ver hoteles","✈️ Ver vuelos","📅 Armar itinerario"]);return 0};
@@ -81,14 +103,14 @@ function local(t){const n=nz(t),s=t.length<40,m=mood(t);let x;if(!s||/internacio
  if(m)return()=>{bot(/barato|econom/.test(m)?"Los destinos más económicos 💰":"Estas opciones te pueden gustar ✨");sug(m,/barato|econom/.test(m))}}
 
 function show(r){r.dbg&&console.warn("Gemini:",r.dbg);bot(r.say||"…");
- const lu=[...S.hist].reverse().find(m=>m.r=="u")?.t||"",up=(k,v)=>(v||(k=="budget"&&v===0&&S.budget==null&&/\b0\b|gratis|cero|nada/i.test(lu)))&&v!=S[k]&&set(k,v),i=r.intent;up("dest",r.dest);up("days",r.days);up("budget",r.budget);up("origin",r.origin);if(r.cost)S.cost=r.cost;if(r.mode&&r.mode!=S.mode){S.mode=r.mode;mode()}
- if(i=="plan"&&r.plan?.length&&cur()){set("plan",r.plan.slice(0,10).map(x=>({t:String(x.t||"").slice(0,90),p:String(x.p||"").slice(0,60)})));showPlan()}
+ const lu=[...S.hist].reverse().find(m=>m.r=="u")?.t||"",up=(k,v)=>(v||(k=="budget"&&v===0&&S.budget==null&&/\b0\b|gratis|cero|nada/i.test(lu)))&&v!=S[k]&&set(k,v),i=r.intent;up("dest",r.dest);up("days",r.days);up("budget",r.budget);up("origin",r.origin);if(r.cost)S.cost=r.cost;if(/^[A-Za-z]{2}$/.test(r.cc||""))S.cc=r.cc.toUpperCase();if(r.mode&&r.mode!=S.mode){S.mode=r.mode;mode()}
+ if(i=="plan"&&r.plan?.length&&cur()){set("plan",r.plan.slice(0,10).map(x=>({t:String(x.t||"").slice(0,90),p:String(x.p||"").slice(0,60),m:String(x.m||"").slice(0,160),a:String(x.a||"").slice(0,160),n:String(x.n||"").slice(0,160),c:x.c==null||!isFinite(+x.c)?null:Math.max(0,Math.round(+x.c))})));showPlan()}
  else if(i=="hotels"||i=="flights")showOpts(i=="hotels"?"hotel":"flight");
  else if(i=="route")goRoute();
  else if(i=="suggest"){if(r.ideas?.length){sh="dest";cards(r.ideas.slice(0,4).map(n=>({w:String(n).replace(/ /g,"_"),e:"🌍",t:String(n),s:"Destino sugerido",btn:[["✅ Elegir","pickn",n]]})))}else sug(nz(r.mood||""))}
  fin();save()}
 async function ai(){const w=add("m dots","<span></span><span></span><span></span>"),p=Array.isArray(S.plan)?S.plan.map((x,i)=>`${i+1}.${x.t}`).join("|"):"?";
- try{const u=bg.auth.currentUser,r=await(await fetch("/api/chat",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({token:await u.getIdToken(),msgs:S.hist.slice(-6),ctx:`Dest:${S.dest||"?"};Días:${S.days||"?"};Presup:${S.budget??"?"};Modo:${S.mode||"?"};Casa:${S.home&&S.home!="gps"?S.home:"?"};Origen:${S.origin||"?"};Hotel:${S.hotel?.n||(S.hotel?"x":"?")};Vuelo:${S.flight?.a||(S.flight?"x":"?")};Plan:${p}`})})).json();w.remove();show(r)}
+ try{const u=bg.auth.currentUser,r=await(await fetch("/api/chat",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({token:await u.getIdToken(),msgs:S.hist.slice(-6),ctx:`Dest:${S.dest||"?"};Días:${S.days||"?"};Presup:${S.budget??"?"};Modo:${S.mode||"?"};Casa:${S.home&&S.home!="gps"?S.home:"?"};Sobrante:${S.budget!=null?S.budget-used():"?"};Pais:${S.cc||"?"};Origen:${S.origin||"?"};Hotel:${S.hotel?.n||(S.hotel?"x":"?")};Vuelo:${S.flight?.a||(S.flight?"x":"?")};Plan:${p}`})})).json();w.remove();show(r)}
  catch{w.remove();say("No pude conectarme 😕 Intenta de nuevo en un momento.")}}
 
 function act(o,b){
@@ -104,8 +126,9 @@ function act(o,b){
 
 function go(t,show){if(S.n++>40)return say("Llegaste al límite de mensajes de esta sesión 🙏 Abre un chat nuevo.");
  say(show||t,1);S.hist.push({r:"u",t:t.slice(0,300)});sh=null;
- if(S.askHome){S.askHome=0;S.home=/ubicaci[oó]n actual/i.test(t)?"gps":t.slice(0,120);bot(S.home=="gps"?"Perfecto, usaré tu ubicación actual 📡":`Anotado: sales desde ${S.home} 🏠`);goRoute();save();return}
- if(t.length>=40){let x;if(S.budget==null&&(x=t.match(/(?:con|presupuesto(?: de)?|\$)\s*\$?\s*(\d[\d,.]{3,})/i)))set("budget",+x[1].replace(/[,.]/g,""));if(!S.days&&(x=nz(t).match(/(\d{1,2})\s*dias?/)))set("days",+x[1])}
+ if(S.askHome){const g=/ubicaci[oó]n actual/i.test(t);if(!g&&(nz(t).trim()==nz(S.origin||"")||t.trim().length<8)){bot("Necesito algo más específico para trazar tu ruta: tu colonia, calle o un punto de referencia 🏠 (ej. \"Metro Juanacatlán, CDMX\")");chips(["📡 Usar mi ubicación actual"]);save();return}
+ S.askHome=0;S.home=/ubicaci[oó]n actual/i.test(t)?"gps":t.slice(0,120);bot(S.home=="gps"?"Perfecto, usaré tu ubicación actual 📡":`Anotado: sales desde ${S.home} 🏠`);goRoute();save();return}
+ if(t.length>=40){let x;if(S.budget==null&&(x=t.match(/(?:con|presupuesto(?: de)?|\$)\s*\$?\s*(\d[\d,.]{3,})/i)))set("budget",+x[1].replace(/[,.]/g,""));if(!S.days&&(x=nz(t).match(/(\d{1,2})\s*dias?/)))set("days",+x[1]);if(!S.days&&(x=nz(t).match(/(\d{1,2}|una?|dos)\s*semanas?/)))set("days",7*({un:1,una:1,dos:2}[x[1]]||+x[1]))}
  const l=local(t);l?(l()!==0&&fin(),save()):ai()}
 function send(t,show){gate(()=>go(t,show),"Inicia sesión para chatear con Book&Go IA ✨")}
 
