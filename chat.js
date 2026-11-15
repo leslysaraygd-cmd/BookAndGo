@@ -29,7 +29,7 @@ function local(t){const m=mood(t),n=nz(t),f=/vuelo|hotel/.exec(n),d=find(S.dest)
  if(t.length<30&&/planear un viaje|crear itinerario/.test(n))return()=>{bot(d?`¿Cuántos días vas a ${S.dest}?`:"¿A dónde te gustaría ir? Si no sabes, elige un estilo 👇");chips(d?["2 días","3 días","5 días","7 días"]:["💞 Romántico","🌴 Tranquilo","🧗 Aventura","👪 Familia"])};
  if(f&&d&&t.length<30)return()=>act({a:f[0]=="vuelo"?"fl":"ht",id:d.id})}
 
-function show(r){bot(r.say||"…");if(r.dest)S.dest=r.dest;if(r.days)S.days=r.days;if(r.budget)S.budget=r.budget;sync();
+function show(r){r.dbg&&console.warn('Gemini:',r.dbg);bot(r.say||"…");if(r.dest)S.dest=r.dest;if(r.days)S.days=r.days;if(r.budget)S.budget=r.budget;sync();
  const d=find(r.dest)||find(S.dest);
  if(r.intent=="plan"&&r.plan?.length){plan(r.plan);d&&chips(["✈️ Ver vuelos","🏨 Ver hoteles"])}
  else if(r.intent=="flights"&&d)act({a:"fl",id:d.id});
