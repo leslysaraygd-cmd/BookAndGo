@@ -76,7 +76,7 @@ function dateCard(){M.querySelectorAll(".dp").forEach(e=>e.remove());add("it dp"
 function setStart(s){if(s<today()){bot("Esa fecha ya pasó 😅 Elige una fecha futura.");return}set("start",s);bot(`📅 Salida: ${fd(s)}${S.days?` · regreso: ${fd(addD(s,nts()-1))}`:""}.`)}
 function sum(){const r=S.budget-used(),h=S.hotel.n?`${esc(S.hotel.n)} · ${mx(hc(S.hotel))}`:lab(S.hotel),f=S.flight.a?`${esc(S.flight.a)} · ${mx(fc(S.flight))}`:lab(S.flight);
   M.querySelectorAll(".sm").forEach(e=>e.remove());
-  add("it sm",`<div><b>${ICO.pin} Resumen</b><span>${esc(S.dest)} · ${nts()} d · ${np()} pers. · desde ${esc(S.origin)}</span></div><div><b>${ICO.cal} Fechas</b><span>${range()}</span></div><div><b>${ICO.hotel} Hotel</b><span>${h}</span></div><div><b>${ICO.plane} Vuelo</b><span>${f}</span></div><div><b>${ICO.map} Plan</b><span>${Array.isArray(S.plan)?S.plan.length+" días":"Sin itinerario"}</span></div><div><b>${ICO.wallet} Total</b><span>${mx(used())} de ${mx(S.budget)} ${r<0?"(Excede presupuesto)":""}</span></div><button data-a="ok">${ICO.check} Confirmar reserva</button>`);
+  add("it sm",`<div><b>${ICO.pin} Resumen</b><span>${esc(S.dest)} · ${nts()} d · ${np()} pers. · desde ${esc(S.origin)}</span></div><div><b>${ICO.cal} Fechas</b><span>${range()}</span></div><div><b>${ICO.hotel} Hotel</b><span>${h}</span></div><div><b>${ICO.plane} Vuelo</b><span>${f}</span></div><div><b>${ICO.map} Plan</b><span>${Array.isArray(S.plan)?S.plan.length+" días":"Sin itinerario"}</span></div><div><b>${ICO.wallet} Total</b><span>${mx(used())} de ${mx(S.budget)} ${r<0?"(Excede presupuesto)":""}</span></div><button data-a="pay">${ICO.wallet} Continuar al pago</button>`);
   bot(S.flight?.a?"¿Quieres ver cómo llegar desde tu casa al aeropuerto?":"¿Quieres ver cómo llegar?");chips([S.flight?.a?"Cómo llegar al aeropuerto":"Cómo llegar","Cambiar algo","Otras ideas"])}
 const AP=()=>{const c=oac();return c?AN[c]||c+" airport":"Aeropuerto "+(S.origin||"")},
 route=(d,t)=>{const h=S.home&&S.home!="gps"?S.home:"",o=h?`&origin=${encodeURIComponent(h)}`:"";add("it",`<div><b>🗺️ ${esc(t)}</b><span>Desde ${h?esc(h):"tu ubicación actual"} (Google Maps)</span></div><div class="ln">${[["🚇 Transporte","transit"],["🚗 Auto","driving"],["🚶 A pie","walking"]].map(([l,m])=>`<a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(d)}${o}&travelmode=${m}" target="_blank" rel="noopener">${l}</a>`).join("")}</div>`)};
@@ -169,6 +169,41 @@ async function ai(){const w=add("m dots","<span></span><span></span><span></span
  try{const u=bg.auth.currentUser,r=await(await fetch("/api/chat",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({token:await u.getIdToken(),msgs:S.hist.slice(-6),ctx:`Hoy:${today()};Inicio:${S.start||"?"};Personas:${S.people||"?"};Dest:${S.dest||"?"};Días:${S.days||"?"};Presup:${S.budget??"?"};Modo:${S.mode||"?"};Casa:${S.home&&S.home!="gps"?S.home:"?"};Sobrante:${S.budget!=null?S.budget-used():"?"};Pais:${S.cc||"?"};Origen:${S.origin||"?"};Hotel:${S.hotel?.n||(S.hotel?"x":"?")};Vuelo:${S.flight?.a||(S.flight?"x":"?")};Plan:${p}`})})).json();w.remove();show(r)}
  catch{w.remove();say("No pude conectarme 😕 Intenta de nuevo en un momento.");chips(["🔁 Reintentar"])}}
 
+const TK={},cl=s=>String(s??"").replace(/[^\u0020-\u00FF]/g,"").trim();
+function ticketData(code){const u=bg.auth.currentUser;
+ return{code,name:u.displayName||u.email.split("@")[0],dest:S.dest,origin:S.origin||"",dates:range().replace("→","a"),days:nts(),people:np(),
+  hotel:S.hotel?.n?`${S.hotel.n} - ${S.hotel.st?S.hotel.st+" estrellas - ":""}${nn()} noche${nn()>1?"s":""}${rooms()>1?` - ${rooms()} hab.`:""}: ${mx(hc(S.hotel))}`:"",
+  flight:S.flight?.a?`${S.flight.a}${S.flight.h?" - "+S.flight.h+" h":""} - ${np()} pers.: ${mx(fc(S.flight))}`:"",
+  total:used(),plan:Array.isArray(S.plan)?S.plan.map((x,i)=>({t:`Día ${i+1}: ${x.t}`,d:[x.m&&"Mañana: "+x.m,x.a&&"Tarde: "+x.a,x.n&&"Noche: "+x.n].filter(Boolean)})):[]}}
+function pdfDoc(t){const d=new window.jspdf.jsPDF({unit:"mm",format:"a4"}),W=210;let y=52;
+ d.setFillColor(124,92,255);d.rect(0,0,W,38,"F");d.setTextColor(255);
+ d.setFont("helvetica","bold");d.setFontSize(22);d.text("Book&Go IA",16,17);
+ d.setFont("helvetica","normal");d.setFontSize(11);d.text("Comprobante de reserva",16,26);
+ d.setFontSize(10);d.text("Código",W-16,14,{align:"right"});d.setFont("helvetica","bold");d.setFontSize(16);d.text(t.code,W-16,24,{align:"right"});
+ const room=n=>{if(y+n>270){d.addPage();y=20}},
+ row=(l,v)=>{if(!v)return;const ls=d.splitTextToSize(cl(v),W-32);room(10+ls.length*6);
+  d.setFont("helvetica","bold");d.setFontSize(9);d.setTextColor(107,114,128);d.text(l.toUpperCase(),16,y);
+  d.setFont("helvetica","normal");d.setFontSize(12);d.setTextColor(17,24,39);d.text(ls,16,y+6);y+=6+ls.length*6+3;
+  d.setDrawColor(229,231,235);d.line(16,y-1,W-16,y-1);y+=5};
+ row("Pasajero",t.name);row("Destino",t.dest);row("Salida desde",t.origin);row("Fechas",t.dates);row("Viajeros",t.people+(t.people>1?" personas":" persona")+" - "+t.days+" días");
+ row("Hotel",t.hotel);row("Vuelo",t.flight);
+ room(24);d.setFillColor(243,240,255);d.roundedRect(16,y,W-32,16,3,3,"F");
+ d.setFont("helvetica","bold");d.setFontSize(11);d.setTextColor(107,114,128);d.text("TOTAL",22,y+10);
+ d.setFontSize(16);d.setTextColor(124,92,255);d.text(cl(mx(t.total)),W-22,y+10.5,{align:"right"});y+=26;
+ if(t.plan.length){room(16);d.setFont("helvetica","bold");d.setFontSize(13);d.setTextColor(17,24,39);d.text("Itinerario",16,y);y+=8;
+  t.plan.forEach(x=>{const ls=[cl(x.t),...x.d.map(cl)].flatMap((s,i)=>d.splitTextToSize(s,W-36).map(z=>[i,z]));room(ls.length*5+4);
+   ls.forEach(([i,z])=>{d.setFont("helvetica",i?"normal":"bold");d.setFontSize(i?9.5:10.5);d.setTextColor(i?75:17,i?85:24,i?99:39);d.text(z,i?20:16,y);y+=5});y+=3})}
+ const n=d.getNumberOfPages();for(let i=1;i<=n;i++){d.setPage(i);d.setFont("helvetica","italic");d.setFontSize(8);d.setTextColor(107,114,128);
+  d.text(d.splitTextToSize("Modo demostración: este documento no es un boleto de avión ni una confirmación de hotel, y no se realizó ningún cargo real.",W-32),16,284)}
+ return d}
+const dlTicket=t=>{try{pdfDoc(t).save("Comprobante-"+t.code+".pdf")}catch(e){console.warn(e);bot("No pude generar el PDF en este momento. Intenta de nuevo.")}};
+async function mailTicket(t){try{const u=bg.auth.currentUser,pdf=pdfDoc(t).output("datauristring").split(",")[1];
+ const r=await(await fetch("/api/ticket",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({token:await u.getIdToken(),code:t.code,name:t.name,dest:t.dest,total:t.total,pdf})})).json();
+ if(r.err)console.warn("ticket:",r.err);return!!r.ok}catch(e){console.warn(e);return false}}
+function pay(){M.querySelectorAll(".pay").forEach(e=>e.remove());
+ const rows=[S.hotel?.n&&`<div><b>${ICO.hotel} Hotel</b><span>${esc(S.hotel.n)} · ${mx(hc(S.hotel))}</span></div>`,S.flight?.a&&`<div><b>${ICO.plane} Vuelo</b><span>${esc(S.flight.a)} · ${mx(fc(S.flight))}</span></div>`].filter(Boolean).join("");
+ add("it pay",`<div><b>${ICO.wallet} Pago</b><span>${esc(S.dest)} · ${np()} pers.</span></div>${rows}<div><b>Total</b><span>${mx(used())}</span></div><div><span style="font-size:12px;opacity:.7">Modo demostración: no se realiza ningún cargo real.</span></div><button data-a="ok">Pagar ${mx(used())}</button>`);
+ bot("Revisa tu resumen de pago y confirma cuando estés listo.");chips(["Cambiar algo"])}
 function act(o,b){
  if(o.a=="pick"){const d=D.find(x=>x.id==o.id);set("dest",d.n);bot(`¡${d.n} es una gran elección! 🌴`);fin()}
  else if(o.a=="pickn")send("Quiero ir a "+o.id);
@@ -176,11 +211,17 @@ function act(o,b){
   set(k=="hotel"?"hotel":"flight",x);bot(`✅ ${k=="hotel"?"Hotel":"Vuelo"} elegido: ${x.n||x.a} (${mx(k=="hotel"?hc(x):fc(x))}).`+(S.budget==null?"":r>=0?` Te quedan ${mx(r)}.`:` ⚠️ Te pasas por ${mx(-r)} de tu presupuesto.`));fin()}
  else if(o.a=="chg")send(`Cambia el día ${+o.id+1} por otra actividad`);
  else if(o.a=="date"){const v=b.parentNode.querySelector("input").value;if(!v){bot("Elige una fecha en el calendario 📅");return}b.closest(".dp").remove();setStart(v);fin()}
-else if(o.a=="ok"){const u=bg.auth.currentUser,c="BG-"+Math.random().toString(36).slice(2,8).toUpperCase();
-   bg.set(bg.ref(bg.db,`reservas/${u.uid}/${c}`),JSON.parse(JSON.stringify({dest:S.dest,days:S.days,origen:S.origin,hotel:S.hotel,vuelo:S.flight,plan:S.plan,total:used(),estado:"confirmada",ts:Date.now()}))).catch(()=>{});
-   b.innerHTML=`${ICO.check} Reserva confirmada`;b.disabled=true;
-   bot(`Reserva confirmada.\nCódigo de confirmación: ${c}\nDestino: ${S.dest} (${nts()} días · ${np()} pers.)\nTotal: ${mx(used())}\nLos detalles de tu itinerario y reservación han sido registrados en tu cuenta.`);
-   chips([S.flight?.a?"Cómo llegar al aeropuerto":"Cómo llegar","Planear otro viaje"])}
+ else if(o.a=="pdf"){const t=TK[o.id];t?dlTicket(t):bot("No encontré ese comprobante.")}
+ else if(o.a=="pay"){if(used())pay();else act({a:"ok"},b)}
+ else if(o.a=="ok"){b.disabled=true;b.textContent="Procesando pago…";const w=add("m dots","<span></span><span></span><span></span>");
+  setTimeout(async()=>{w.remove();const u=bg.auth.currentUser,c="BG-"+Math.random().toString(36).slice(2,8).toUpperCase();
+   bg.set(bg.ref(bg.db,`reservas/${u.uid}/${c}`),JSON.parse(JSON.stringify({dest:S.dest,days:S.days,origen:S.origin,hotel:S.hotel,vuelo:S.flight,plan:S.plan,total:used(),estado:"confirmada",pago:{demo:true,monto:used()},ts:Date.now()}))).catch(()=>{});
+   b.innerHTML=`${ICO.check} Pago confirmado`;
+   bot(`Pago confirmado.\nCódigo de confirmación: ${c}\nDestino: ${S.dest} (${nts()} días · ${np()} pers.)\nTotal pagado: ${mx(used())}\nTu reserva quedó registrada en tu cuenta. Modo demostración: no se realizó ningún cargo real.`);
+   if(used()){const t=TK[c]=ticketData(c);add("it tk",`<div><b>${ICO.check} Comprobante</b><span>Código ${c}</span></div><button data-a="pdf" data-id="${c}">Descargar comprobante (PDF)</button>`);
+    const w2=add("m dots","<span></span><span></span><span></span>"),sent=await mailTicket(t);w2.remove();
+    bot(sent?`Te enviamos el comprobante en PDF a ${u.email}. Revisa también tu carpeta de spam.`:"No pude enviar el comprobante a tu correo en este momento, pero puedes descargarlo con el botón de arriba.")}
+   chips([S.flight?.a?"Cómo llegar al aeropuerto":"Cómo llegar","Planear otro viaje"]);save()},1400)}
  save()}
 
 function go(t,show){if(S.n++>40)return say("Llegaste al límite de mensajes de esta sesión 🙏 Abre un chat nuevo.");
