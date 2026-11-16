@@ -3,12 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>try{var t=localStorage.getItem("bg-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 <title>Mis viajes · Book&Go IA</title>
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{--side:#0b1020;--ink:#111827;--muted:#6b7280;--bg:#f8fafc;--card:#fff;--brand:#7c5cff;--brand2:#a855f7;--line:#e5e7eb;--chip:#e0edff;--chipt:#1d4ed8;--ok:#059669;--okbg:#d1fae5;--warn:#b45309;--warnbg:#fef3c7;--gray:#4b5563;--graybg:#e5e7eb}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#f1f5f9;--muted:#9ca3af;--bg:#0f172a;--card:#1e293b;--line:#334155;--chip:#1e3a8a;--chipt:#bfdbfe;--ok:#6ee7b7;--okbg:#064e3b;--warn:#fcd34d;--warnbg:#78350f;--gray:#d1d5db;--graybg:#374151;color-scheme:dark}}
+:root[data-theme="dark"]{--ink:#f1f5f9;--muted:#9ca3af;--bg:#0f172a;--card:#1e293b;--line:#334155;--chip:#1e3a8a;--chipt:#bfdbfe;color-scheme:dark}
 *{box-sizing:border-box}
 svg.lucide{width:18px;height:18px;vertical-align:-3px;stroke-width:2}
 body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);display:flex;min-height:100vh}
@@ -68,6 +70,8 @@ section{padding:36px 60px 100px}
   <a href="itinerarios.html"><i data-lucide="map"></i> Itinerarios</a>
   <a class="on" href="misviajes.html"><i data-lucide="briefcase"></i> Mis Viajes</a>
   <a href="opiniones.html"><i data-lucide="star"></i> Opiniones</a>
+  <a href="perfil.html"><i data-lucide="user"></i> Perfil</a>
+  <a href="configuracion.html"><i data-lucide="settings"></i> Configuración</a>
   <div class="promo">
     <b>Planifica mejor con nuestra IA</b>
     <p>Aquí queda el detalle de tus viajes reservados, próximos y pasados.</p>

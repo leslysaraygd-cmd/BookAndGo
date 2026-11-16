@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>try{var t=localStorage.getItem("bg-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 <title>Book&Go IA</title>
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -231,8 +232,8 @@ body:not(.logged) .auth-only,body:not(.logged) .fab{display:none!important}
   <a href="itinerarios.html"><i data-lucide="map"></i> Itinerarios</a>
   <a class="auth-only" id="nTrips" href="misviajes.html"><i data-lucide="briefcase"></i> Mis Viajes</a>
   <a href="opiniones.html"><i data-lucide="star"></i> Opiniones</a>
-  <a class="auth-only" id="nProf"><i data-lucide="user"></i> Perfil</a>
-  <a><i data-lucide="settings"></i> Configuración</a>
+  <a class="auth-only" id="nProf" href="perfil.html"><i data-lucide="user"></i> Perfil</a>
+  <a class="auth-only" href="configuracion.html"><i data-lucide="settings"></i> Configuración</a>
   <a><i data-lucide="shield"></i> Panel de Administración</a>
   <div class="promo">
     <div class="p-ico"><i data-lucide="sparkles"></i></div>
@@ -513,8 +514,8 @@ onAuthStateChanged(auth,sync);
 $("uc").onclick=e=>{e.stopPropagation();$("dd").classList.toggle("open")};
 document.addEventListener("click",()=>$("dd").classList.remove("open"));
 $("lo").onclick=()=>signOut(auth);
-$("mc").onclick=()=>toast("Configuración: próximamente");
-$("mp").onclick=()=>$("pfm").showModal();
+$("mc").onclick=()=>location.href="configuracion.html";
+$("mp").onclick=()=>location.href="perfil.html";
 $("pX").onclick=()=>$("pfm").close();
 $("pfm").onclose=()=>{newFoto=undefined;auth.currentUser&&show(auth.currentUser)};
 $("av3").onclick=()=>$("pf").click();
@@ -534,7 +535,7 @@ $("pfForm").onsubmit=async e=>{e.preventDefault();const u=auth.currentUser,n=$("
 
 // ---- Proteger secciones ----
 window.gate=(fn,txt)=>{if(document.body.classList.contains("logged"))return fn();after=fn;view("fLogin");msg(txt,1);dlg.showModal()};
-$("nProf").onclick=()=>$("pfm").showModal();
+
 const q=new URLSearchParams(location.search);
 if(q.has("reservar")){const id=q.get("reservar");history.replaceState(null,"",location.pathname);after=()=>{preset();openChat();pickDest(id)};pend="Inicia sesión para reservar tu viaje ✨"}
 if(q.has("itinerario")){const id=q.get("itinerario");history.replaceState(null,"",location.pathname);after=async()=>{try{const u=auth.currentUser,s=await get(ref(db,`itinerarios/${u.uid}/${id}`));if(s.exists()){openChat();loadItin(s.val(),id)}}catch{}};pend="Inicia sesión para ver tu itinerario ✨"}

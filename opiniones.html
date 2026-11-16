@@ -3,11 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>try{var t=localStorage.getItem("bg-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 <title>Opiniones · Book&Go IA</title>
 <script src="https://unpkg.com/lucide@latest"></script>
 <style>
 :root{--side:#0b1020;--ink:#111827;--muted:#6b7280;--bg:#f8fafc;--card:#fff;--brand:#7c5cff;--brand2:#a855f7;--line:#e5e7eb;--chip:#e0edff;--chipt:#1d4ed8}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#f1f5f9;--muted:#9ca3af;--bg:#0f172a;--card:#1e293b;--line:#334155;--chip:#1e3a8a;--chipt:#bfdbfe;color-scheme:dark}}
+:root[data-theme="dark"]{--ink:#f1f5f9;--muted:#9ca3af;--bg:#0f172a;--card:#1e293b;--line:#334155;--chip:#1e3a8a;--chipt:#bfdbfe;color-scheme:dark}
 *{box-sizing:border-box}
 svg.lucide{width:18px;height:18px;vertical-align:-3px;stroke-width:2}
 body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);display:flex;min-height:100vh}
@@ -82,6 +84,8 @@ details .more{display:grid;gap:8px;margin-top:10px;font-size:13px;color:var(--mu
   <a href="itinerarios.html"><i data-lucide="map"></i> Itinerarios</a>
   <a href="misviajes.html"><i data-lucide="briefcase"></i> Mis Viajes</a>
   <a class="on" href="opiniones.html"><i data-lucide="star"></i> Opiniones</a>
+  <a href="perfil.html"><i data-lucide="user"></i> Perfil</a>
+  <a href="configuracion.html"><i data-lucide="settings"></i> Configuración</a>
   <div class="promo">
     <b>¿Ya viajaste con nosotros?</b>
     <p>Cuéntanos cómo te fue y sube una foto de tu viaje.</p>
