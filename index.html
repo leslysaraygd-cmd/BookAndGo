@@ -267,10 +267,11 @@ body:not(.logged) .auth-only,body:not(.logged) .fab{display:none!important}
 <script>
 
 const $=id=>document.getElementById(id);
+$("d1").min=$("d2").min=new Date().toLocaleDateString("sv-SE");$("d1").onchange=()=>{$("d2").min=$("d1").value||$("d1").min};
 $("sf").onsubmit=e=>{e.preventDefault();const d=$("dest").value.trim();if(!d){$("dest").focus();return}
   if($("d1").value&&$("d2").value&&$("d2").value<$("d1").value){alert("La fecha de regreso debe ser posterior a la de inicio.");return}
-  $("td").textContent=d;$("tf").textContent=$("d1").value&&$("d2").value?$("d1").value+" → "+$("d2").value:"—";gate(()=>{send("Quiero viajar a "+d)},"Inicia sesión para planear tu viaje con IA ✨")};
-$("create").onclick=$("start").onclick=()=>gate(()=>{send("Quiero crear mi viaje con IA")},"Inicia sesión para crear tu viaje con IA ✨");
+  $("td").textContent=d;$("tf").textContent=$("d1").value&&$("d2").value?$("d1").value+" → "+$("d2").value:"—";gate(()=>{preset({start:$("d1").value,end:$("d2").value});openChat();send("Quiero viajar a "+d)},"Inicia sesión para planear tu viaje con IA ✨")};
+$("create").onclick=$("start").onclick=()=>gate(()=>{preset();openChat();send("Quiero crear mi viaje con IA")},"Inicia sesión para crear tu viaje con IA ✨");
 
 </script>
 <script src="chat.js"></script>

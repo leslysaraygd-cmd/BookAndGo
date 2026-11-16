@@ -13,4 +13,11 @@ const wrap=fn=>async(req,res)=>{
   if(!await auth(b.token))return res.status(401).json({items:[],err:"auth"});
   try{await fn(b,res)}catch(e){console.error(e);res.json({items:[],err:String(e.message||e).slice(0,200)})}
 };
-module.exports={auth,env,cached,fx,wrap};
+// Fechas del viaje: usa la fecha elegida (si es futura) o, si no, hoy + 30 días.
+// "days" = días del viaje (incluye llegada y salida); span = noches (mín. 1 para cotizar).
+const iso=d=>d.toISOString().slice(0,10);
+const trip=b=>{const days=Math.min(Math.max(+b.days||3,1),30),today=iso(new Date()),
+  s=/^\d{4}-\d{2}-\d{2}$/.test(b.start||"")&&b.start>=today?b.start:iso(new Date(Date.now()+30*864e5)),
+  span=Math.max(days-1,1),dep=new Date(s+"T12:00:00Z");
+  return{days,span,dep:iso(dep),ret:iso(new Date(+dep+span*864e5))}};
+module.exports={auth,env,cached,fx,wrap,trip};
