@@ -17,13 +17,17 @@ module.exports=async(req,res)=>{
   while(h[0]?.role==="model")h.shift();
   if(!h.length||!process.env.GEMINI_API_KEY)return res.status(500).json({say:"Servicio no disponible por ahora 😕",intent:"chat"});
   let dbg="";
-  for(const m of [process.env.GEMINI_MODEL,"gemini-2.5-flash-lite","gemini-2.5-flash","gemini-flash-lite-latest"].filter(Boolean)){
+  for(const m of [...new Set([process.env.GEMINI_MODEL,"gemini-2.5-flash-lite","gemini-2.5-flash","gemini-flash-lite-latest"].filter(Boolean))]){
     try{
-      const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`,{method:"POST",headers:{"content-type":"application/json","x-goog-api-key":process.env.GEMINI_API_KEY},body:JSON.stringify({systemInstruction:{parts:[{text:SYS+" Contexto: "+String(ctx).slice(0,1500)}]},contents:h,generationConfig:{maxOutputTokens:4000,temperature:.7,responseMimeType:"application/json",responseSchema:SCHEMA}})});
+      const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`,{method:"POST",headers:{"content-type":"application/json","x-goog-api-key":process.env.GEMINI_API_KEY},body:JSON.stringify({systemInstruction:{parts:[{text:SYS+" Contexto: "+String(ctx).slice(0,1500)}]},contents:h,generationConfig:{maxOutputTokens:6000,temperature:.7,responseMimeType:"application/json",responseSchema:SCHEMA,...(/^gemini-2\.5-flash(-lite)?$/.test(m)?{thinkingConfig:{thinkingBudget:0}}:{})}})});
       const j=await r.json();
       if(!r.ok){dbg=`${m}: ${j.error?.message||r.status}`;console.error(dbg);continue}
-      return res.json(JSON.parse(j.candidates[0].content.parts[0].text));
+      const c=j.candidates?.[0];
+      if(c?.finishReason==="MAX_TOKENS"){dbg=`${m}: respuesta cortada`;console.error(dbg);continue} // JSON incompleto: prueba otro modelo
+      const out=JSON.parse(c.content.parts[0].text);
+      if(out.intent==="plan"&&!(Array.isArray(out.plan)&&out.plan.length)){dbg=`${m}: dijo plan pero no lo incluyó`;console.error(dbg);continue}
+      return res.json(out);
     }catch(e){dbg=`${m}: ${e.message}`;console.error(dbg)}
   }
-  res.json({say:"Se me cruzaron los cables 😅 ¿Me lo repites?",intent:"chat",dbg});
+  res.json({say:"Se me cruzaron los cables 😅 Dale a reintentar.",intent:"chat",err:1,dbg});
 };

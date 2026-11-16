@@ -119,6 +119,7 @@ function local(t){const n=nz(t),s=t.length<40,m=mood(t);let x;if(!s||/internacio
  if(/voy en avion/.test(n))return()=>{S.mode="fly";sync();return goRoute()};
  if(/voy por tierra/.test(n))return()=>{S.mode="road";if(!S.flight)S.flight="n";sync();return goRoute()};
  if(/como llegar|llegar al aeropuerto/.test(n))return goRoute;
+ if(/reintentar/.test(n))return()=>{const u=[...S.hist].reverse().find(m=>m.r=="u"&&!/reintentar/i.test(m.t))?.t;if(u)send(u);return 0};
  if(/otras opciones/.test(n))return()=>{S.ofs++;showOpts(S.opt?.k||"hotel")};
  if(/cambiar algo/.test(n))return()=>{bot("Dime qué quieres cambiar: hotel, vuelo, destino, días o presupuesto 😉");chips(["🏨 Ver hoteles","✈️ Ver vuelos","📅 Armar itinerario"]);return 0};
  if(/otro viaje/.test(n))return()=>{RS();sync();bot("🆕 ¡Nuevo viaje! Empezamos de cero 🌎")};
@@ -126,23 +127,27 @@ function local(t){const n=nz(t),s=t.length<40,m=mood(t);let x;if(!s||/internacio
  if(/armar itinerario|crear itinerario|planear un viaje/.test(n))return()=>{if(S.dest&&S.days&&!/planear/.test(n)){send(`Arma mi itinerario de ${nts()} días a ${S.dest}`);return 0}};
  if(m)return()=>{bot(/barato|econom/.test(m)?"Los destinos más económicos 💰":"Estas opciones te pueden gustar ✨");sug(m,/barato|econom/.test(m))}}
 
-function show(r){r.dbg&&console.warn("Gemini:",r.dbg);bot(r.say||"…");
+function show(r){r.dbg&&console.warn("Gemini:",r.dbg);bot(r.say||"…");if(r.err){chips(["🔁 Reintentar"]);save();return}
  const lu=[...S.hist].reverse().find(m=>m.r=="u")?.t||"",up=(k,v)=>(v||(k=="budget"&&v===0&&S.budget==null&&/\b0\b|gratis|cero|nada/i.test(lu)))&&v!=S[k]&&set(k,v),i=r.intent,nl=nz(lu),
   dOK=/dias?|noches?|semanas?|fin de semana|puente|quincena|\d.*\bal\b.*\d/.test(nl),
   bOK=/\d|\bmil\b|gratis|cero|nada|sin dinero/.test(nl),
   sOK=/\d|manana|pasado|proxim|navidad|ano nuevo|semana santa|verano|enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre/.test(nl),
+  oOK=!!r.origin&&(nl.includes(nz(r.origin))||nz(r.origin).split(/\s+/).some(x=>x.length>=5&&nl.includes(x))||(!!oi(r.origin)&&oi(r.origin)==oi(lu))),
+  wp=!!(S.days&&cur()&&(/itinerario|dia por dia|plan de|actividad|cambia (el )?dia|agenda/.test(nl)||(Array.isArray(S.plan)&&/otras ideas|otro plan|otra opcion|cambia|modifica|barato|economico/.test(nl)))),
   pOK=/\d|somos|\bsolo\b|\bsola\b|pareja|espos|novi[oa]|\b(dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\b/.test(nl);
- up("dest",r.dest);up("days",dOK&&!PR.days&&!(S.days&&i=="plan")?r.days:0);up("budget",bOK&&!PR.budget?r.budget:undefined);up("origin",r.origin);
+ up("dest",r.dest);up("days",dOK&&!PR.days&&!(S.days&&i=="plan")?r.days:0);up("budget",bOK&&!PR.budget?r.budget:undefined);up("origin",oOK?r.origin:0);
  {const st=sOK&&/^\d{4}-\d{2}-\d{2}$/.test(r.start||"")&&r.start>=today()?r.start:0;up("start",st);up("people",pOK&&!PR.people?Math.min(Math.max(+r.people||0,0),20):0)}
- if(S.origin&&!oi(S.origin)&&/^[A-Z]{3}$/.test(r.oa||""))S.oa=r.oa;if(cur()&&!IA[cur().id]&&/^[A-Z]{3}$/.test(r.da||""))S.da=r.da;if(r.cost)S.cost=r.cost;if(/^[A-Za-z]{2}$/.test(r.cc||""))S.cc=r.cc.toUpperCase();if(r.mode&&r.mode!=S.mode){S.mode=r.mode;mode()}
- if(i=="plan"&&r.plan?.length&&cur()&&S.days&&(/itinerario|dia por dia|plan de|actividad|cambia (el )?dia|agenda/.test(nl)||(Array.isArray(S.plan)&&/otras ideas|otro plan|otra opcion|cambia|modifica|barato|economico/.test(nl)))){set("plan",r.plan.slice(0,10).map(x=>({t:String(x.t||"").slice(0,90),p:String(x.p||"").slice(0,60),m:String(x.m||"").slice(0,160),a:String(x.a||"").slice(0,160),n:String(x.n||"").slice(0,160),c:x.c==null||!isFinite(+x.c)?null:Math.max(0,Math.round(+x.c))})));showPlan()}
+ if(S.origin&&!oi(S.origin)&&/^[A-Z]{3}$/.test(r.oa||""))S.oa=r.oa;if(cur()&&!IA[cur().id]&&/^[A-Z]{3}$/.test(r.da||""))S.da=r.da;if(r.cost)S.cost=r.cost;if(/^[A-Za-z]{2}$/.test(r.cc||""))S.cc=r.cc.toUpperCase();if(r.mode&&S.origin&&r.mode!=S.mode){S.mode=r.mode;mode()}
+ if(i=="plan"&&r.plan?.length&&wp){set("plan",r.plan.slice(0,10).map(x=>({t:String(x.t||"").slice(0,90),p:String(x.p||"").slice(0,60),m:String(x.m||"").slice(0,160),a:String(x.a||"").slice(0,160),n:String(x.n||"").slice(0,160),c:x.c==null||!isFinite(+x.c)?null:Math.max(0,Math.round(+x.c))})));showPlan()}
+ else if(wp&&(i=="plan"||/itinerario/.test(nl))){ // la IA prometió el itinerario pero no lo entregó: no repetir su mensaje falso
+  [...M.querySelectorAll(".m")].pop()?.remove();S.hist.pop();bot("Uy, no alcancé a armar el itinerario esta vez 😕 ¿Lo intento de nuevo?");chips(["📅 Armar itinerario","Más tarde"]);save();return}
  else if(i=="hotels"||i=="flights")showOpts(i=="hotels"?"hotel":"flight");
  else if(i=="route")goRoute();
  else if(i=="suggest"){if(r.ideas?.length){sh="dest";cards(r.ideas.slice(0,4).map(n=>({w:String(n).replace(/ /g,"_"),e:"🌍",t:String(n),s:"Destino sugerido",btn:[["✅ Elegir","pickn",n]]})))}else sug(nz(r.mood||""))}
  fin();save()}
 async function ai(){const w=add("m dots","<span></span><span></span><span></span>"),p=Array.isArray(S.plan)?S.plan.map((x,i)=>`${i+1}.${x.t}`).join("|"):"?";
  try{const u=bg.auth.currentUser,r=await(await fetch("/api/chat",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({token:await u.getIdToken(),msgs:S.hist.slice(-6),ctx:`Hoy:${today()};Inicio:${S.start||"?"};Personas:${S.people||"?"};Dest:${S.dest||"?"};Días:${S.days||"?"};Presup:${S.budget??"?"};Modo:${S.mode||"?"};Casa:${S.home&&S.home!="gps"?S.home:"?"};Sobrante:${S.budget!=null?S.budget-used():"?"};Pais:${S.cc||"?"};Origen:${S.origin||"?"};Hotel:${S.hotel?.n||(S.hotel?"x":"?")};Vuelo:${S.flight?.a||(S.flight?"x":"?")};Plan:${p}`})})).json();w.remove();show(r)}
- catch{w.remove();say("No pude conectarme 😕 Intenta de nuevo en un momento.")}}
+ catch{w.remove();say("No pude conectarme 😕 Intenta de nuevo en un momento.");chips(["🔁 Reintentar"])}}
 
 function act(o,b){
  if(o.a=="pick"){const d=D.find(x=>x.id==o.id);set("dest",d.n);bot(`¡${d.n} es una gran elección! 🌴`);fin()}
