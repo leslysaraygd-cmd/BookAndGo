@@ -53,12 +53,16 @@ async function pic(el){const{w,q,img}=el.dataset;let u,cr;try{
 const cards=a=>{const e=add("cards",a.map(x=>`<div class="cc"><div class="im" data-w="${esc(x.w||"")}" data-q="${esc(x.q||"")}" data-img="${esc(x.img||"")}"><i>${x.e||"🌎"}</i>${x.p!=null?`<b>${mx(x.p)}${x.pl||""}</b>`:""}</div><div class="bd"><h4>${esc(x.t)}</h4><p>${esc(x.s)}</p>${x.d?.length?`<ul style="margin:4px 0 0;padding-left:16px;font-size:12px;color:var(--muted)">${x.d.map(l=>`<li style="margin-bottom:4px">${esc(l)}</li>`).join("")}</ul>`:""}<div class="bt2">${x.btn.map(([l,a,i])=>`<button data-a="${a}" data-id="${esc(i)}">${l}</button>`).join("")}</div></div></div>`).join(""));e.querySelectorAll(".im").forEach(pic)};
 function sync(){$("td").textContent=S.dest||"Sin destino";$("tb").textContent=S.budget!=null?mx(S.budget):"Por definir";$("tf").textContent=range();let t=$("tp");if(!t){t=document.createElement("div");t.id="tp";$("tb").parentNode.append(t)}
  t.innerHTML=`<br>🧳 ${S.days||"—"} días · 👥 ${S.people||"—"} · desde ${esc(S.origin||"—")}<br>🏨 ${lab(S.hotel,"n")}<br>✈️ ${lab(S.flight,"a")}<br>💸 Restante: ${S.budget!=null?mx(S.budget-used()):"—"}`}
-function save(){const u=window.bg?.auth.currentUser;if(!u)return;const s={};[...K,"mode","cost","home","cc","lastOrigin","oa","da"].forEach(k=>s[k]=S[k]??null);
+// Itinerarios: cada plan generado se guarda en itinerarios/<uid>/<id>. Si el usuario cambia un día, se actualiza el mismo.
+function saveItin(){const u=window.bg?.auth.currentUser;if(!u||!Array.isArray(S.plan)||!S.plan.length||!S.dest)return;
+ const id=S.iid||(S.iid="i"+Date.now().toString(36)+Math.random().toString(36).slice(2,5)),now=Date.now();
+ bg.set(bg.ref(bg.db,`itinerarios/${u.uid}/${id}`),JSON.parse(JSON.stringify({dest:S.dest,days:S.days||S.plan.length,start:S.start&&S.start!="x"?S.start:null,people:S.people||null,budget:S.budget??null,origin:S.origin||null,mode:S.mode||null,cc:S.cc||null,cost:S.cost||null,hotel:S.hotel?.n?S.hotel:null,flight:S.flight?.a?S.flight:null,plan:S.plan,ts:S.its||(S.its=now),upd:now}))).catch(()=>{})}
+function save(){const u=window.bg?.auth.currentUser;if(!u)return;const s={};[...K,"mode","cost","home","cc","lastOrigin","oa","da","iid","its"].forEach(k=>s[k]=S[k]??null);
  bg.set(bg.ref(bg.db,"chats/"+u.uid),JSON.parse(JSON.stringify({m:S.hist.slice(-20),s}))).catch(()=>{})}
-function set(k,v){if(k=="dest"&&S.dest&&nz(S.dest)!=nz(v))S.hotel=S.flight=S.plan=S.mode=S.pp=S.cc=S.da=0;if(k=="origin"&&S.origin!=v)S.oa=0;if(/^(dest|days|origin|start|people)$/.test(k))S.rc=0;S[k]=v;S.done=0;sync()}
+function set(k,v){if(k=="dest"&&S.dest&&nz(S.dest)!=nz(v))S.hotel=S.flight=S.plan=S.mode=S.pp=S.cc=S.da=S.iid=S.its=0;if(k=="origin"&&S.origin!=v)S.oa=0;if(/^(dest|days|origin|start|people)$/.test(k))S.rc=0;S[k]=v;S.done=0;sync()}
 
 // Borra todo lo del viaje anterior (destino, país, cotizaciones, historial para la IA...). Conserva "home" y recuerda el último origen.
-const RS=()=>{if(S.origin)S.lastOrigin=S.origin;K.forEach(k=>S[k]=0);S.budget=null;S.mode=S.cost=S.pp=S.done=S.askHome=S.cc=S.rc=S.opt=S.oa=S.da=0;S.ofs=0;S.hist=[];sh=null;M.querySelectorAll(".chips,.sm,.dp").forEach(e=>e.remove())};
+const RS=()=>{if(S.origin)S.lastOrigin=S.origin;K.forEach(k=>S[k]=0);S.budget=null;S.mode=S.cost=S.pp=S.done=S.askHome=S.cc=S.rc=S.opt=S.oa=S.da=S.iid=S.its=0;S.ofs=0;S.hist=[];sh=null;M.querySelectorAll(".chips,.sm,.dp").forEach(e=>e.remove())};
 // ---------- Flujo del viaje (no estricto: siempre sabe qué falta) ----------
 const Q={dest:["¿A dónde te gustaría ir? Dime un destino o elige un estilo 👇",["💞 Romántico","🌴 Tranquilo","🧗 Aventura","🌍 Internacional"]],
 days:["¿Cuántos días durará tu viaje?",["2 días","3 días","5 días","7 días"]],
@@ -111,7 +115,7 @@ cards(l.map((o,i)=>k=="hotel"?{w:d.k,img:o.img,e:ICO.bigHotel,t:o.n,s:`${o.st} e
   const depTxt=S.start&&S.start!="x"?fd(S.start):"fechas seleccionadas";
   say(k=="hotel"?`Tarifas disponibles en ${d.n} para ${L?.dep?`${fd(L.dep)} – ${fd(L.out)}`:depTxt} (por habitación). Sujetas a disponibilidad.`:`Tarifas disponibles hacia ${d.n}${L?.dep?` (${fd(L.dep)} – ${fd(L.ret)})`:""}, precio redondo por persona.`);
   chips(["Ver otras opciones"])}
-function showPlan(){sh="plan";const d=cur();
+function showPlan(ns){sh="plan";const d=cur();if(!ns)saveItin();
  cards(S.plan.map((x,i)=>({w:d?.k,q:`${x.p} ${S.dest}`,e:"📅",t:`Día ${i+1}`+(x.m?`: ${x.t}`:""),s:x.m?(x.c!=null?`≈ ${mx(x.c)} ese día${np()>1?" por persona":""}`:""):x.t,d:[x.m&&"🌅 "+x.m,x.a&&"☀️ "+x.a,x.n&&"🌙 "+x.n].filter(Boolean),btn:[["✏️ Cambiar","chg",i]]})));
  if(S.plan.some(x=>x.c!=null)){const tot=S.plan.reduce((a,x)=>a+(+x.c||0),0)*np(),rest=S.budget!=null?Math.max(S.budget-used(),0):null;
   say(`💸 Comidas, entradas y transporte local estimados${np()>1?` para ${np()} personas`:""}: ${mx(tot)}`+(rest!=null?` de ${mx(rest)} que te sobran ${tot<=rest?"✅":"⚠️"}`:""))}
@@ -243,13 +247,19 @@ function pre(t){const n=nz(t);let x,b=null;PR={};
 function send(t,show){gate(()=>go(t,show),"Inicia sesión para chatear con Book&Go IA ✨")}
 
 let rs;async function restore(){const u=window.bg?.auth.currentUser;if(!u||rs==u.uid)return;rs=u.uid;
- try{const s=await bg.get(bg.ref(bg.db,"chats/"+u.uid));if(s.exists()&&!S.hist.length){const v=s.val();S.hist=v.m||[];[...K,"mode","cost","home","cc","lastOrigin","oa","da"].forEach(k=>S[k]=v.s?.[k]??(k=="budget"?null:0));S.hist.forEach(m=>say(m.t,m.r=="u"));sync();if(S.dest){sh="r";fin()}}}catch{}}
+ try{const s=await bg.get(bg.ref(bg.db,"chats/"+u.uid));if(s.exists()&&!S.hist.length){const v=s.val();S.hist=v.m||[];[...K,"mode","cost","home","cc","lastOrigin","oa","da","iid","its"].forEach(k=>S[k]=v.s?.[k]??(k=="budget"?null:0));S.hist.forEach(m=>say(m.t,m.r=="u"));sync();if(S.dest){sh="r";fin()}}}catch{}}
 
 // La página principal llama a preset() para empezar un viaje limpio (con las fechas del buscador, si las hay).
 window.preset=({start,end}={})=>{RS();if(start&&start>=today()){S.start=start;if(end&&end>=start)S.days=Math.min(Math.round((new Date(end)-new Date(start))/864e5)+1,30)}sync()};
 window.DESTS=D;
 // Desde "Explorar": deja el destino ya elegido y el chat sigue directo con la reserva (días, fechas, personas, hotel, vuelo y pago).
 window.pickDest=id=>{const d=D.find(x=>x.id==id);if(!d)return;set("dest",d.n);if(d.i){S.mode="intl";S.cc=d.cc;S.cost=d.c;mode()}bot(`¡Elegiste ${d.n}! 🌴 Ya tengo el destino, vamos a armar tu reserva ✈️`);fin();save()};
+// Desde "Itinerarios": retoma un itinerario guardado para pedirle cambios a la IA.
+window.loadItin=(it,id)=>{if(!it||!Array.isArray(it.plan))return;RS();
+ ["dest","days","start","people","budget","origin"].forEach(k=>it[k]!=null&&set(k,it[k]));
+ S.mode=it.mode||0;S.cc=it.cc||0;S.cost=it.cost||0;if(it.hotel)S.hotel=it.hotel;if(it.flight)S.flight=it.flight;
+ S.plan=it.plan;S.iid=id;S.its=it.ts||0;sync();
+ bot(`Retomé tu itinerario de ${it.dest} ✏️ Usa "Cambiar" en el día que quieras, o dime qué te gustaría ajustar.`);showPlan(1);save()};
 window.send=send;
 window.openChat=()=>{$("chat").classList.add("open");$("fab").style.display="none";$("ci").focus();restore()};
 $("fab").onclick=openChat;

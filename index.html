@@ -201,7 +201,7 @@ body:not(.logged) .auth-only,body:not(.logged) .fab{display:none!important}
   <div class="logo"><i data-lucide="compass" style="width:28px;height:28px;color:#4f8cff"></i> Book&amp;Go <b>IA</b></div>
   <a class="on"><i data-lucide="home"></i> Inicio</a>
   <a href="explorar.html"><i data-lucide="compass"></i> Explorar</a>
-  <a><i data-lucide="map"></i> Itinerarios</a>
+  <a href="itinerarios.html"><i data-lucide="map"></i> Itinerarios</a>
   <a class="auth-only" id="nTrips"><i data-lucide="briefcase"></i> Mis Viajes</a>
   <a><i data-lucide="star"></i> Opiniones</a>
   <a class="auth-only" id="nProf"><i data-lucide="user"></i> Perfil</a>
@@ -471,7 +471,7 @@ const sync=async u=>{
  const ok=u&&u.emailVerified;
  $("btnLogin").hidden=!!ok;$("um").hidden=!ok;
  document.body.classList.toggle("logged",!!ok);
- if(!ok){P={};$("x").click();if(after&&pend){pend=0;view("fLogin");msg("Inicia sesión para reservar tu viaje ✨",1);dlg.showModal()}return}
+ if(!ok){P={};$("x").click();if(after&&pend){const t=pend;pend=0;view("fLogin");msg(t,1);dlg.showModal()}return}
  try{P=(await get(ref(db,"usuarios/"+u.uid))).val()||{}}catch{P={}}
  show(u);
  const f=after;after=null;if(f){if(dlg.open)dlg.close();f()}
@@ -505,7 +505,8 @@ $("nProf").onclick=()=>$("pfm").showModal();
 $("nTrips").onclick=()=>$("trips").scrollIntoView({behavior:"smooth"});
 $("tripsBtn").onclick=()=>$("create").click();
 const q=new URLSearchParams(location.search);
-if(q.has("reservar")){const id=q.get("reservar");history.replaceState(null,"",location.pathname);after=()=>{preset();openChat();pickDest(id)};pend=1}
+if(q.has("reservar")){const id=q.get("reservar");history.replaceState(null,"",location.pathname);after=()=>{preset();openChat();pickDest(id)};pend="Inicia sesión para reservar tu viaje ✨"}
+if(q.has("itinerario")){const id=q.get("itinerario");history.replaceState(null,"",location.pathname);after=async()=>{try{const u=auth.currentUser,s=await get(ref(db,`itinerarios/${u.uid}/${id}`));if(s.exists()){openChat();loadItin(s.val(),id)}}catch{}};pend="Inicia sesión para ver tu itinerario ✨"}
 if(q.has("verificado")||q.has("reset")){history.replaceState(null,"",location.pathname);view("fLogin");msg(q.has("reset")?"Contraseña actualizada. Inicia sesión con la nueva.":"¡Correo confirmado! Inicia sesión para continuar.",1);dlg.showModal()}
 
 // ---- Opiniones en Firestore ----

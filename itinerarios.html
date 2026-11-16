@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mis itinerarios · Book&Go IA</title>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+:root{--side:#0b1020;--ink:#111827;--muted:#6b7280;--bg:#f8fafc;--card:#fff;--brand:#7c5cff;--brand2:#a855f7;--line:#e5e7eb;--chip:#e0edff;--chipt:#1d4ed8;--danger:#e11d48}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#f1f5f9;--muted:#9ca3af;--bg:#0f172a;--card:#1e293b;--line:#334155;--chip:#1e3a8a;--chipt:#bfdbfe;color-scheme:dark}}
+*{box-sizing:border-box}
+svg.lucide{width:18px;height:18px;vertical-align:-3px;stroke-width:2}
+body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);display:flex;min-height:100vh}
+aside{width:277px;background:var(--side);color:#cbd5e1;padding:20px 19px;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.logo{font-size:26px;font-weight:700;color:#fff;margin:6px 0 16px}.logo b{color:#4f8cff}
+aside a{display:block;padding:11px 20px;border-radius:12px;color:#cbd5e1;text-decoration:none;cursor:pointer}
+aside a.on,aside a:hover{background:#1c2438;color:#fff}
+.promo{margin-top:auto;background:linear-gradient(160deg,#2e1065,#1e1b4b);border-radius:18px;padding:20px;text-align:center;color:#fff}
+.promo p{font-size:14px;color:#cbd5e1;margin:6px 0 12px}
+.btn{border:0;border-radius:999px;padding:12px 28px;color:#fff;font:inherit;font-size:16px;cursor:pointer;background:linear-gradient(90deg,var(--brand),var(--brand2));text-decoration:none;display:inline-block;text-align:center}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.outline{border:1.5px solid var(--brand);color:var(--brand);background:transparent;border-radius:99px;padding:11px 22px;font:inherit;font-size:15px;cursor:pointer;text-decoration:none;display:inline-block;text-align:center}
+.ghost{border:1.5px solid var(--line);color:var(--ink);background:transparent;border-radius:99px;padding:11px 22px;font:inherit;font-size:15px;cursor:pointer}
+main{flex:1;min-width:0}
+.hero{padding:48px 60px 56px;color:#fff;background:linear-gradient(180deg,#0b1020aa,#0b102066),url("banner.jpg") center/cover no-repeat}
+.hero h1{font-size:42px;line-height:1.1;margin:0 0 12px}.hero h1 span{color:#a78bfa}
+.hero p{max-width:640px;opacity:.9;font-size:18px;margin:0}
+.chip{display:inline-block;background:var(--chip);color:var(--chipt);font-size:13px;padding:6px 18px;border-radius:99px;margin-bottom:16px}
+section{padding:36px 60px 120px}
+.state{text-align:center;color:var(--muted);padding:60px 20px;background:var(--card);border-radius:20px;box-shadow:0 4px 14px #0001}
+.state h3{color:var(--ink);margin:0 0 8px;font-size:22px}.state p{margin:0 0 20px;line-height:1.6}
+.state .acts{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:24px}
+.it{background:var(--card);border-radius:20px;overflow:hidden;box-shadow:0 4px 14px #0001;display:flex;flex-direction:column;transition:.2s}.it:hover{transform:translateY(-3px);box-shadow:0 12px 28px #0002}
+.cov{height:150px;position:relative;background:linear-gradient(135deg,var(--brand),var(--brand2));display:grid;place-items:center;font-size:44px}.cov img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cov b{position:absolute;left:12px;bottom:10px;z-index:1;color:#fff;font-size:22px;text-shadow:0 2px 8px #000a}
+.ib{padding:18px;display:flex;flex-direction:column;gap:8px;flex:1}.meta{display:grid;gap:4px;font-size:14px;color:var(--muted)}.meta b{color:var(--ink);font-weight:600}
+.upd{font-size:12px;color:var(--muted)}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:auto;padding-top:6px}.row>*{flex:1;white-space:nowrap}
+.back{background:none;border:0;color:var(--brand);font:inherit;font-size:15px;cursor:pointer;padding:0;margin-bottom:18px}
+.dhead{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.dhead h2{margin:0 0 8px;font-size:32px}.dhead .meta{grid-auto-flow:row}
+.tot{background:var(--chip);color:var(--chipt);border-radius:14px;padding:10px 16px;font-size:14px;line-height:1.5}
+.days{display:grid;gap:18px}
+.day{background:var(--card);border-radius:18px;padding:20px;box-shadow:0 4px 14px #0001;display:grid;gap:12px}
+.dh{display:flex;justify-content:space-between;align-items:center}.dh b{font-size:17px;color:var(--brand)}
+.ctl{display:flex;gap:6px}.ctl button{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer;font-size:15px}.ctl button:disabled{opacity:.35;cursor:default}.ctl button.x:hover{color:var(--danger);border-color:var(--danger)}
+.day label{display:grid;gap:5px;font-size:13px;color:var(--muted)}
+.day input,.day textarea{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:10px 12px;font:inherit;font-size:15px;resize:vertical}
+.day input:focus,.day textarea:focus{outline:2px solid var(--brand);border-color:transparent}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.add{margin-top:6px}
+.bar{position:sticky;bottom:0;margin:26px -60px 0;padding:14px 60px calc(14px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:1px solid var(--line);display:flex;gap:12px;flex-wrap:wrap;align-items:center;box-shadow:0 -6px 20px #0001}
+.bar .sp{flex:1;min-width:10px;color:var(--muted);font-size:14px}
+.bar .del{color:var(--danger);border-color:var(--danger)}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#111827;color:#fff;border-radius:99px;padding:11px 22px;font-size:15px;z-index:50;opacity:0;pointer-events:none;transition:.25s}.toast.on{opacity:1}
+[hidden]{display:none!important}
+@media(max-width:860px){body{flex-direction:column}aside{width:100%;height:auto;position:static;flex-direction:row;flex-wrap:wrap;align-items:center;padding:12px 16px}.logo{margin:0 auto 0 0;font-size:22px}.promo{display:none}.hero{padding:32px 22px 40px}.hero h1{font-size:32px}section{padding:26px 22px 120px}.bar{margin:26px -22px 0;padding-left:22px;padding-right:22px}.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<aside>
+  <div class="logo"><i data-lucide="compass" style="width:28px;height:28px;color:#4f8cff"></i> Book&amp;Go <b>IA</b></div>
+  <a href="index.html"><i data-lucide="home"></i> Inicio</a>
+  <a href="explorar.html"><i data-lucide="compass"></i> Explorar</a>
+  <a class="on" href="itinerarios.html"><i data-lucide="map"></i> Itinerarios</a>
+  <div class="promo">
+    <b>Planifica mejor con nuestra IA</b>
+    <p>Tus itinerarios del chat se guardan aquí para que los ajustes cuando quieras.</p>
+    <a class="btn" href="index.html">Volver al inicio</a>
+  </div>
+</aside>
+<main>
+  <div class="hero">
+    <span class="chip">ITINERARIOS</span>
+    <h1>Tus <span>itinerarios</span> guardados</h1>
+    <p>Aquí quedan los planes que armaste con Book&amp;Go IA. Ábrelos para cambiar días, actividades o costos, o sigue ajustándolos en el chat.</p>
+  </div>
+  <section>
+    <div id="state" class="state"><p>Cargando tus itinerarios…</p></div>
+    <div id="list" class="grid" hidden></div>
+    <div id="detail" hidden></div>
+  </section>
+</main>
+<div class="toast" id="toast"></div>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {getDatabase,ref,get,update,remove} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+const app=initializeApp({apiKey:"AIzaSyBY0KCEgBwrKV02kiFTGZLtWOxO9ozzSso",authDomain:"bookandgo-ad08d.firebaseapp.com",databaseURL:"https://bookandgo-ad08d-default-rtdb.firebaseio.com",projectId:"bookandgo-ad08d",storageBucket:"bookandgo-ad08d.firebasestorage.app",messagingSenderId:"772819367761",appId:"1:772819367761:web:5fdf584737cf2ea3ad8570",measurementId:"G-NZKR4SKYC6"}),auth=getAuth(app),db=getDatabase(app);
+
+const $=id=>document.getElementById(id),esc=s=>String(s??"").replace(/[&<>"']/g,c=>"&#"+c.charCodeAt(0)+";"),
+mx=p=>"$"+(+p).toLocaleString("es-MX")+" MXN",
+addD=(s,n)=>{const d=new Date(s+"T12:00");d.setDate(d.getDate()+n);return d},
+fd=d=>(d instanceof Date?d:new Date(d+"T12:00")).toLocaleDateString("es-MX",{day:"numeric",month:"short"}),
+fdl=ts=>new Date(ts).toLocaleDateString("es-MX",{day:"numeric",month:"short",year:"numeric"}),
+range=it=>it.start?`${fd(it.start)} → ${fd(addD(it.start,Math.max((it.days||it.plan.length)-1,0)))}`:"Fechas por definir",
+arr=p=>(Array.isArray(p)?p:Object.values(p||{})).filter(Boolean).map(x=>({t:x.t||"",p:x.p||"",m:x.m||"",a:x.a||"",n:x.n||"",c:x.c==null||!isFinite(+x.c)?null:+x.c})),
+estTotal=(plan,people)=>plan.reduce((a,x)=>a+(+x.c||0),0)*(people||1);
+let uid=null,items={},curId=null,draft=[],dirty=false;
+const show=(w)=>{["state","list","detail"].forEach(k=>$(k).hidden=k!=w)};
+const state=(h)=>{$("state").innerHTML=h;show("state")};
+const toast=t=>{const e=$("toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("on"),2200)};
+const icons=()=>window.lucide?.createIcons();
+const WK={};
+const cover=async el=>{const q=el.dataset.q;try{const u=await(WK[q]??=fetch(`https://es.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(q)}&gsrlimit=1&prop=pageimages&piprop=thumbnail&pithumbsize=600&format=json&origin=*`).then(r=>r.json()).then(j=>Object.values(j.query?.pages||{})[0]?.thumbnail?.source));if(u){const i=new Image();i.alt="";i.onload=()=>{el.querySelector("span")?.remove();el.prepend(i)};i.src=u}}catch{}};
+
+// ---------- Lista ----------
+function renderList(){
+  const l=Object.entries(items).sort((a,b)=>(b[1].upd||b[1].ts||0)-(a[1].upd||a[1].ts||0));
+  if(!l.length){state(`<h3>Aún no tienes itinerarios guardados</h3><p>Cuando Book&amp;Go IA arme un itinerario en el chat, se guardará aquí automáticamente.</p><div class="acts"><a class="btn" href="index.html">Planear un viaje</a><a class="outline" href="explorar.html">Explorar destinos</a></div>`);return}
+  $("list").innerHTML=l.map(([id,it])=>{const t=estTotal(it.plan,it.people);return `<article class="it"><div class="cov" data-q="${esc(it.dest)}"><span>🗺️</span><b>${esc(it.dest)}</b></div><div class="ib"><div class="meta"><span>📅 <b>${esc(range(it))}</b></span><span>🧳 ${it.days||it.plan.length} día${(it.days||it.plan.length)>1?"s":""}${it.people?` · 👥 ${it.people} persona${it.people>1?"s":""}`:""}</span>${it.budget!=null?`<span>💰 Presupuesto: ${mx(it.budget)}</span>`:""}${t?`<span>🍽️ Actividades ≈ ${mx(t)}</span>`:""}</div><span class="upd">Actualizado el ${fdl(it.upd||it.ts||Date.now())}</span><div class="row"><button class="btn" data-open="${esc(id)}">Ver y editar</button><a class="outline" href="index.html?itinerario=${encodeURIComponent(id)}">Seguir en el chat</a></div></div></article>`}).join("");
+  show("list");$("list").querySelectorAll(".cov").forEach(cover);icons();
+}
+$("list").onclick=e=>{const b=e.target.closest("[data-open]");b&&openDetail(b.dataset.open)};
+
+// ---------- Detalle / edición ----------
+function openDetail(id){curId=id;draft=structuredClone(items[id].plan);dirty=false;renderDetail();scrollTo({top:0})}
+function setDirty(v){dirty=v;const s=$("sv");if(s){s.disabled=!v;$("ds").disabled=!v;$("dl").textContent=v?"Tienes cambios sin guardar":"Todo guardado ✓"}}
+function renderDetail(){
+  const it=items[curId],n=draft.length,days=draft.map((x,i)=>`<div class="day" data-i="${i}"><div class="dh"><b>Día ${i+1}</b><span class="ctl"><button data-a="up" ${i?"":"disabled"} aria-label="Subir día">↑</button><button data-a="dn" ${i<n-1?"":"disabled"} aria-label="Bajar día">↓</button><button class="x" data-a="rm" ${n>1?"":"disabled"} aria-label="Quitar día">✕</button></span></div>
+  <div class="two"><label>Título del día<input data-f="t" maxlength="90" value="${esc(x.t)}"></label><label>Lugar principal<input data-f="p" maxlength="60" value="${esc(x.p)}"></label></div>
+  <label>🌅 Mañana<textarea data-f="m" rows="2" maxlength="300">${esc(x.m)}</textarea></label>
+  <label>☀️ Tarde<textarea data-f="a" rows="2" maxlength="300">${esc(x.a)}</textarea></label>
+  <label>🌙 Noche<textarea data-f="n" rows="2" maxlength="300">${esc(x.n)}</textarea></label>
+  <label>💸 Costo estimado del día (MXN${it.people>1?" por persona":""}): comidas, entradas y transporte local<input data-f="c" type="number" min="0" step="50" inputmode="numeric" value="${x.c==null?"":x.c}"></label></div>`).join("");
+  $("detail").innerHTML=`<button class="back" id="bk">← Volver a mis itinerarios</button>
+  <div class="dhead"><div><h2>${esc(it.dest)}</h2><div class="meta"><span>📅 <b>${esc(range({...it,days:n}))}</b> · 🧳 ${n} día${n>1?"s":""}${it.people?` · 👥 ${it.people} persona${it.people>1?"s":""}`:""}</span>${it.origin?`<span>📍 Sales desde ${esc(it.origin)}</span>`:""}${it.budget!=null?`<span>💰 Presupuesto: ${mx(it.budget)}</span>`:""}${it.hotel?.n?`<span>🏨 ${esc(it.hotel.n)}</span>`:""}${it.flight?.a?`<span>✈️ ${esc(it.flight.a)}</span>`:""}</div></div><div class="tot" id="tot"></div></div>
+  <div class="days" id="days">${days}</div>
+  <button class="outline add" id="ad" ${n>=30?"disabled":""}>＋ Agregar día</button>
+  <div class="bar"><button class="btn" id="sv" disabled>Guardar cambios</button><button class="ghost" id="ds" disabled>Descartar</button><a class="outline" id="ch" href="#">Seguir en el chat con IA</a><span class="sp" id="dl">Todo guardado ✓</span><button class="ghost del" id="rmv">Eliminar itinerario</button></div>`;
+  show("detail");setDirty(dirty);updTot();
+}
+function updTot(){const t=estTotal(draft,items[curId].people),e=$("tot");e.hidden=!t;if(t)e.innerHTML=`🍽️ Actividades, comidas y transporte local estimados${items[curId].people>1?` para ${items[curId].people} personas`:""}:<br><b>${mx(t)}</b>`}
+$("detail").oninput=e=>{const f=e.target.dataset.f;if(!f)return;const i=+e.target.closest(".day").dataset.i;draft[i][f]=f=="c"?(e.target.value===""?null:Math.max(0,Math.round(+e.target.value)||0)):e.target.value;setDirty(true);updTot()};
+$("detail").onclick=async e=>{
+  const b=e.target.closest("button,a");if(!b)return;
+  if(b.id=="bk"){if(dirty&&!confirm("Tienes cambios sin guardar. ¿Salir sin guardarlos?"))return;dirty=false;renderList()}
+  else if(b.id=="ad"){draft.push({t:"Día libre",p:"",m:"",a:"",n:"",c:null});setDirty(true);renderDetail();setDirty(true);document.querySelector(".day:last-child")?.scrollIntoView({behavior:"smooth",block:"center"})}
+  else if(b.dataset.a){const i=+b.closest(".day").dataset.i,a=b.dataset.a;
+    if(a=="rm"){if(draft.length<2||!confirm(`¿Quitar el día ${i+1}?`))return;draft.splice(i,1)}
+    else{const j=a=="up"?i-1:i+1;if(j<0||j>=draft.length)return;[draft[i],draft[j]]=[draft[j],draft[i]]}
+    dirty=true;renderDetail();setDirty(true)}
+  else if(b.id=="ds"){draft=structuredClone(items[curId].plan);dirty=false;renderDetail()}
+  else if(b.id=="sv")await save();
+  else if(b.id=="ch"){e.preventDefault();if(dirty&&!await save())return;location.href="index.html?itinerario="+encodeURIComponent(curId)}
+  else if(b.id=="rmv"){if(!confirm(`¿Eliminar el itinerario de ${items[curId].dest}? Esta acción no se puede deshacer.`))return;
+    try{await remove(ref(db,`itinerarios/${uid}/${curId}`));delete items[curId];dirty=false;toast("Itinerario eliminado");renderList()}catch(err){console.warn(err);toast("No se pudo eliminar, intenta de nuevo")}}
+};
+async function save(){
+  const plan=draft.map(x=>({t:String(x.t||"").trim().slice(0,90),p:String(x.p||"").trim().slice(0,60),m:String(x.m||"").trim().slice(0,300),a:String(x.a||"").trim().slice(0,300),n:String(x.n||"").trim().slice(0,300),c:x.c==null?null:Math.max(0,Math.round(+x.c)||0)}));
+  if(!plan.length){toast("El itinerario necesita al menos un día");return false}
+  $("sv").disabled=true;
+  try{const upd=Date.now();await update(ref(db,`itinerarios/${uid}/${curId}`),{plan:plan.map(x=>({...x,c:x.c??null})),days:plan.length,upd});
+    Object.assign(items[curId],{plan:arr(plan),days:plan.length,upd});draft=structuredClone(items[curId].plan);dirty=false;setDirty(false);updTot();toast("Cambios guardados ✨");return true}
+  catch(err){console.warn(err);setDirty(true);toast("No se pudo guardar, intenta de nuevo");return false}
+}
+addEventListener("beforeunload",e=>{if(dirty){e.preventDefault();e.returnValue=""}});
+
+// ---------- Sesión y carga ----------
+onAuthStateChanged(auth,async u=>{
+  if(!u||!u.emailVerified){uid=null;state(`<h3>Inicia sesión para ver tus itinerarios</h3><p>Tus planes se guardan en tu cuenta de Book&amp;Go IA.</p><div class="acts"><a class="btn" href="index.html">Ir al inicio</a></div>`);return}
+  uid=u.uid;state("<p>Cargando tus itinerarios…</p>");
+  try{const v=(await get(ref(db,`itinerarios/${uid}`))).val()||{};
+    items={};for(const[id,x]of Object.entries(v)){const plan=arr(x.plan);if(x.dest&&plan.length)items[id]={...x,plan}}
+    renderList()}
+  catch(err){console.warn("itinerarios:",err);state(`<h3>No pudimos cargar tus itinerarios</h3><p>Intenta de nuevo en unos minutos.</p><div class="acts"><button class="btn" onclick="location.reload()">Reintentar</button></div>`)}
+});
+icons();
+</script>
+</body>
+</html>
