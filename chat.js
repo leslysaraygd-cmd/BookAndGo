@@ -22,7 +22,7 @@ ICO={
   bigPin:'<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>'
 },
 // [id, nombre, etiquetas, costo/día MXN, título de Wikipedia para la foto]
-D=[["pv","Puerto Vallarta","playa romantico tranquilo",1800,"Puerto_Vallarta"],["cun","Cancún","playa familia aventura",2200,"Cancún"],["oax","Oaxaca","cultura gastronomia tranquilo",1300,"Oaxaca_de_Juárez"],["sc","San Cristóbal","cultura aventura tranquilo",1100,"San_Cristóbal_de_las_Casas"],["gto","Guanajuato","cultura romantico tranquilo",1200,"Guanajuato_(Guanajuato)"],["tul","Tulum","playa romantico aventura",2400,"Tulum"],["bac","Bacalar","tranquilo romantico playa",1500,"Bacalar"],["cdmx","Ciudad de México","cultura gastronomia familia",1500,"Ciudad_de_México"],["mty","Monterrey","aventura familia",1600,"Monterrey"],["lap","La Paz","playa tranquilo aventura",1700,"La_Paz_(Baja_California_Sur)"]].map(([id,n,t,c,k])=>({id,n,t,c,k})),
+D=[["pv","Puerto Vallarta","playa romantico tranquilo",1800,"Puerto_Vallarta"],["cun","Cancún","playa familia aventura",2200,"Cancún"],["oax","Oaxaca","cultura gastronomia tranquilo",1300,"Oaxaca_de_Juárez"],["sc","San Cristóbal","cultura aventura tranquilo",1100,"San_Cristóbal_de_las_Casas"],["gto","Guanajuato","cultura romantico tranquilo",1200,"Guanajuato_(Guanajuato)"],["tul","Tulum","playa romantico aventura",2400,"Tulum"],["bac","Bacalar","tranquilo romantico playa",1500,"Bacalar"],["cdmx","Ciudad de México","cultura gastronomia familia",1500,"Ciudad_de_México"],["mty","Monterrey","aventura familia",1600,"Monterrey"],["lap","La Paz","playa tranquilo aventura",1700,"La_Paz_(Baja_California_Sur)"],["nyc","Nueva York","cultura gastronomia familia",5500,"Nueva_York",1,"US","New York"],["lv","Las Vegas","aventura gastronomia familia",4200,"Las_Vegas",1,"US","Las Vegas"],["par","París","romantico cultura gastronomia",4800,"París",1,"FR","Paris"],["mad","Madrid","cultura gastronomia familia",3600,"Madrid",1,"ES","Madrid"],["bcn","Barcelona","playa cultura gastronomia",3800,"Barcelona",1,"ES","Barcelona"],["rom","Roma","romantico cultura gastronomia",4200,"Roma",1,"IT","Rome"],["lon","Londres","cultura familia",5600,"Londres",1,"GB","London"],["tyo","Tokio","cultura gastronomia aventura",4500,"Tokio",1,"JP","Tokyo"],["bue","Buenos Aires","cultura gastronomia romantico",2600,"Buenos_Aires",1,"AR","Buenos Aires"],["cus","Cusco","aventura cultura",2200,"Cuzco",1,"PE","Cusco"],["dxb","Dubái","aventura familia playa",5000,"Dubái",1,"AE","Dubai"],["ist","Estambul","cultura gastronomia romantico",2800,"Estambul",1,"TR","Istanbul"]].map(([id,n,t,c,k,i,cc,q])=>({id,n,t,c,k,i,cc,q})),
 find=n=>n&&D.find(x=>nz(x.n).includes(nz(n))||nz(n).includes(nz(x.n))),
 cur=()=>S.dest&&(find(S.dest)||{id:"g",n:S.dest,t:"",c:S.cost||(S.mode=="intl"?2800:1600),k:S.dest.replace(/ /g,"_")}),
 nts=()=>S.days||3,nn=()=>Math.max(nts()-1,1),np=()=>S.people||1,rooms=()=>Math.ceil(np()/2),
@@ -90,7 +90,7 @@ function goRoute(){if(!S.dest){bot("Primero dime a dónde quieres ir 🌎");retu
 function mode(){const m=S.mode;S.done=0;
  if(/local|road/.test(m)){if(!S.flight)S.flight="n";if(m=="local"){if(!S.hotel)S.hotel="n";if(!S.days)S.days=1}goRoute()}
  if(m=="intl"&&!S.pp){S.pp=1;bot("🛂 Es un viaje internacional: revisa que tu pasaporte esté vigente y los requisitos de entrada (visa, seguro) del país.")}sync()}
-const IA={pv:"PVR",cun:"CUN",oax:"OAX",sc:"TGZ",gto:"BJX",tul:"TQO",bac:"CTM",cdmx:"MEX",mty:"MTY",lap:"LAP"},
+const IA={pv:"PVR",cun:"CUN",oax:"OAX",sc:"TGZ",gto:"BJX",tul:"TQO",bac:"CTM",cdmx:"MEX",mty:"MTY",lap:"LAP",nyc:"JFK",lv:"LAS",par:"CDG",mad:"MAD",bcn:"BCN",rom:"FCO",lon:"LHR",tyo:"HND",bue:"EZE",cus:"CUZ",dxb:"DXB",ist:"IST"},
 OA=[["MEX",/cdmx|ciudad de mexico|mexico city|\bdf\b|neza|chimalhuac|ecatepec|tlalnepantla|naucalpan|ixtapaluca|chalco|texcoco|iztapalapa|iztacalco|coacalco|tecamac|cuautitlan|huixquilucan|atizapan|azcapotzalco|coyoacan|xochimilco|tlahuac|milpa alta|chicoloapan|los reyes|edomex|estado de mexico|tultitlan|nicolas romero|zumpango|acolman|amecameca/],
 ["GDL",/guadalajara|zapopan|tlaquepaque|tonala/],["MTY",/monterrey|san nicolas de los garza|apodaca|escobedo|san pedro garza|santa catarina/],["PBC",/puebla/],["TLC",/toluca|metepec/],["QRO",/queretaro/],
 ["BJX",/guanajuato|irapuato|silao|celaya|leon,? gto/],["TIJ",/tijuana/],["MID",/merida/],["CUN",/cancun/],["VER",/veracruz/],["OAX",/oaxaca/],["CUU",/chihuahua/],["HMO",/hermosillo/],["CUL",/culiacan/],["MLM",/morelia/],["AGU",/aguascalientes/],["SLP",/san luis potosi/],["TRC",/torreon/],["VSA",/villahermosa/],["TGZ",/tuxtla/],["ACA",/acapulco/],["PVR",/puerto vallarta/],["SJD",/los cabos|cabo san lucas|san jose del cabo/],["MZT",/mazatlan/],["CJS",/ciudad juarez/]],
@@ -100,7 +100,7 @@ oi=o=>{o=nz(o||"");return(OA.find(([,r])=>r.test(o))||[""])[0]},
 oac=()=>S.rc?.flight?.from||oi(S.origin)||S.oa||"",
 fd=s=>new Date(s+"T12:00").toLocaleDateString("es-MX",{day:"numeric",month:"short"});
 async function real(k,d){try{const u=bg.auth.currentUser;if(!u)return null;
- const r=await(await fetch("/api/"+(k=="hotel"?"hotels":"flights"),{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({token:await u.getIdToken(),dest:d.n,origin:S.origin||"Ciudad de México",days:nts(),start:S.start&&S.start!="x"?S.start:"",people:np(),cc:find(d.n)?"MX":S.cc||"",dc:IA[d.id]||S.da||"",oc:oi(S.origin)||S.oa||""})})).json();
+ const r=await(await fetch("/api/"+(k=="hotel"?"hotels":"flights"),{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({token:await u.getIdToken(),dest:d.q||d.n,origin:S.origin||"Ciudad de México",days:nts(),start:S.start&&S.start!="x"?S.start:"",people:np(),cc:d.cc||(find(d.n)?"MX":S.cc||""),dc:IA[d.id]||S.da||"",oc:oi(S.origin)||S.oa||""})})).json();
  if(r.err)console.warn("API "+k+":",r.err);return r.items?.length?r:null}catch(e){console.warn(e);return null}}
 async function showOpts(k){const d=cur();if(!d){bot("Primero dime a dónde quieres ir 🌎");return fin()}
  sh=k;S.rc||={};let L=S.rc[k];
@@ -117,7 +117,7 @@ function showPlan(){sh="plan";const d=cur();
   say(`💸 Comidas, entradas y transporte local estimados${np()>1?` para ${np()} personas`:""}: ${mx(tot)}`+(rest!=null?` de ${mx(rest)} que te sobran ${tot<=rest?"✅":"⚠️"}`:""))}
  chips(["👍 Me gusta","🔁 Otras ideas"])}
 const dc=d=>({w:d.k,e:"📍",t:d.n,s:(S.budget?`≈ ${mx(d.c*nts()*np())} por ${nts()} días${np()>1?" · "+np()+" pers.":""} · `:"")+d.t.split(" ").join(" · "),p:d.c,pl:"/día",btn:[["✅ Elegir","pick",d.id]]});
-function sug(m,b){sh="dest";let l=b?[...D].sort((a,c)=>a.c-c.c):D.filter(x=>(!m||x.t.includes(m.slice(0,6)))&&(!S.budget||x.c*nts()*np()<=S.budget));if(!l.length)l=[...D].sort((a,c)=>a.c-c.c);cards(l.slice(0,4).map(dc))}
+function sug(m,b){sh="dest";const DN=D.filter(x=>!x.i);let l=b?[...DN].sort((a,c)=>a.c-c.c):DN.filter(x=>(!m||x.t.includes(m.slice(0,6)))&&(!S.budget||x.c*nts()*np()<=S.budget));if(!l.length)l=[...DN].sort((a,c)=>a.c-c.c);cards(l.slice(0,4).map(dc))}
 
 // ---------- Botones/frases cortas: se resuelven en local (0 tokens) ----------
 const mood=t=>(nz(t).match(/romantic|aventura|tranquil|familia|playa|cultura|gastronom|barato|econom/)||[])[0];
@@ -249,7 +249,7 @@ let rs;async function restore(){const u=window.bg?.auth.currentUser;if(!u||rs==u
 window.preset=({start,end}={})=>{RS();if(start&&start>=today()){S.start=start;if(end&&end>=start)S.days=Math.min(Math.round((new Date(end)-new Date(start))/864e5)+1,30)}sync()};
 window.DESTS=D;
 // Desde "Explorar": deja el destino ya elegido y el chat sigue directo con la reserva (días, fechas, personas, hotel, vuelo y pago).
-window.pickDest=id=>{const d=D.find(x=>x.id==id);if(!d)return;set("dest",d.n);bot(`¡Elegiste ${d.n}! 🌴 Ya tengo el destino, vamos a armar tu reserva ✈️`);fin();save()};
+window.pickDest=id=>{const d=D.find(x=>x.id==id);if(!d)return;set("dest",d.n);if(d.i){S.mode="intl";S.cc=d.cc;S.cost=d.c;mode()}bot(`¡Elegiste ${d.n}! 🌴 Ya tengo el destino, vamos a armar tu reserva ✈️`);fin();save()};
 window.send=send;
 window.openChat=()=>{$("chat").classList.add("open");$("fab").style.display="none";$("ci").focus();restore()};
 $("fab").onclick=openChat;

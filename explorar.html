@@ -34,6 +34,14 @@ section{padding:40px 60px 100px}
 .ebd{padding:18px;display:flex;flex-direction:column;gap:10px;flex:1}.ecard h4{margin:0;font-size:19px}.ecard p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
 .tg{display:flex;gap:6px;flex-wrap:wrap}.tg span{background:var(--chip);color:var(--chipt);font-size:12px;padding:3px 10px;border-radius:99px;text-transform:capitalize}
 .ecard .btn{margin-top:auto;width:100%;padding:11px 16px;font-size:15px}
+.filters.reg{margin-bottom:12px}.filters.reg button{font-weight:600}
+.egrid{align-items:start}
+.facts{display:grid;gap:4px;font-size:13px;color:var(--muted)}.facts b{color:var(--ink);font-weight:600}
+details{border-top:1px solid var(--line);padding-top:10px}summary{cursor:pointer;font-size:14px;font-weight:600;color:var(--brand);list-style:none}summary::-webkit-details-marker{display:none}summary::after{content:" ▾"}details[open] summary::after{content:" ▴"}
+details ul{margin:10px 0 0;padding-left:18px;font-size:13px;color:var(--muted);line-height:1.6}
+details .more{display:grid;gap:8px;margin-top:10px;font-size:13px;color:var(--muted);line-height:1.5}details .more b{color:var(--ink)}
+.note{background:var(--chip);color:var(--chipt);border-radius:12px;padding:8px 12px;font-size:12.5px;line-height:1.45}
+.cnt{color:var(--muted);font-size:14px;margin:0 0 18px}
 @media(max-width:860px){body{flex-direction:column}aside{width:100%;height:auto;position:static;flex-direction:row;flex-wrap:wrap;align-items:center;padding:12px 16px}.logo{margin:0 auto 0 0;font-size:22px}.promo{display:none}.hero{padding:32px 22px 44px}.hero h1{font-size:34px}section{padding:28px 22px 80px}}
 </style>
 </head>
@@ -52,37 +60,497 @@ section{padding:40px 60px 100px}
   <div class="hero">
     <span class="chip">EXPLORAR</span>
     <h1>Destinos <span>recomendados</span> para ti</h1>
-    <p>Elige uno y Book&amp;Go IA te lleva directo a reservarlo, sin volver a escribir nada.</p>
+    <p>Destinos en México y el mundo. Elige uno, revisa los detalles y Book&amp;Go IA te lleva directo a reservarlo.</p>
   </div>
   <section>
+    <div class="filters reg" id="regs"></div>
     <div class="filters" id="filters"></div>
+    <p class="cnt" id="cnt"></p>
     <div class="egrid" id="egrid"></div>
   </section>
 </main>
 <script>
-// [id, nombre, etiquetas, costo por día (MXN), título de Wikipedia para la foto, descripción]. Los id coinciden con los de chat.js.
+// Los id coinciden con los de chat.js (Reservar manda ?reservar=<id> al index). Costos aproximados por persona/día, sin vuelo.
 const D=[
-["pv","Puerto Vallarta","playa romantico tranquilo",1800,"Puerto_Vallarta","Playas, malecón y atardeceres frente al Pacífico. Ideal para una escapada en pareja."],
-["cun","Cancún","playa familia aventura",2200,"Cancún","Mar turquesa, parques y vida nocturna. Perfecto para ir en familia o con amigos."],
-["oax","Oaxaca","cultura gastronomia tranquilo",1300,"Oaxaca_de_Juárez","Mercados, mezcal y tradición viva. Un viaje para comer, caminar y descubrir cultura."],
-["sc","San Cristóbal","cultura aventura tranquilo",1100,"San_Cristóbal_de_las_Casas","Pueblo mágico entre montañas, cafés y artesanías. Muy tranquilo y lleno de aventura."],
-["gto","Guanajuato","cultura romantico tranquilo",1200,"Guanajuato_(Guanajuato)","Callejones de colores, túneles y leyendas. Una ciudad romántica y fácil de recorrer a pie."],
-["tul","Tulum","playa romantico aventura",2400,"Tulum","Ruinas frente al mar, cenotes y hoteles boutique. Naturaleza y relax en el Caribe."],
-["bac","Bacalar","tranquilo romantico playa",1500,"Bacalar","La laguna de los siete colores. Calma total para desconectarte y navegar en kayak."],
-["cdmx","Ciudad de México","cultura gastronomia familia",1500,"Ciudad_de_México","Museos, tacos y barrios con historia. Siempre hay un plan nuevo por descubrir."],
-["mty","Monterrey","aventura familia",1600,"Monterrey","Montañas, parques y buena comida norteña. Aventura urbana para toda la familia."],
-["lap","La Paz","playa tranquilo aventura",1700,"La_Paz_(Baja_California_Sur)","Aguas tranquilas, lobos marinos y playas casi vacías. Una joya de Baja California Sur."]
-].map(([id,n,t,c,k,d])=>({id,n,t,c,k,d}));
-const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"']/g,c=>"&#"+c.charCodeAt(0)+";"),g=$("egrid"),F=$("filters");
-const TAGS=["todos","playa","romantico","tranquilo","aventura","familia","cultura","gastronomia"],LAB={romantico:"romántico",gastronomia:"gastronomía"};
+{
+"id": "pv",
+"n": "Puerto Vallarta",
+"t": "playa romantico tranquilo",
+"c": 1800,
+"k": "Puerto_Vallarta",
+"i": 0,
+"cc": "",
+"pais": "México",
+"epoca": "Nov–may (clima seco)",
+"dur": "3–5 días",
+"idioma": "",
+"top": [
+"Malecón y esculturas",
+"Playa Los Muertos y Zona Romántica",
+"Islas Marietas",
+"Atardecer en Mismaloya"
+],
+"tip": "Reserva con anticipación el tour a las Islas Marietas: el acceso diario es limitado.",
+"d": "Playas, malecón y atardeceres frente al Pacífico. Ideal para una escapada en pareja con buena comida y vida nocturna tranquila."
+},
+{
+"id": "cun",
+"n": "Cancún",
+"t": "playa familia aventura",
+"c": 2200,
+"k": "Cancún",
+"i": 0,
+"cc": "",
+"pais": "México",
+"epoca": "Dic–abr (menos lluvia)",
+"dur": "4–6 días",
+"idioma": "",
+"top": [
+"Zona hotelera y playas",
+"Isla Mujeres",
+"Xcaret y Xel-Há",
+"Excursión a Chichén Itzá"
+],
+"tip": "Septiembre y octubre suelen traer más lluvia y riesgo de huracanes; mejor evitarlos.",
+"d": "Mar turquesa, parques y vida nocturna. Perfecto para ir en familia o con amigos, con todo a la mano."
+},
+{
+"id": "oax",
+"n": "Oaxaca",
+"t": "cultura gastronomia tranquilo",
+"c": 1300,
+"k": "Oaxaca_de_Juárez",
+"i": 0,
+"cc": "",
+"pais": "México",
+"epoca": "Oct–abr",
+"dur": "3–4 días",
+"idioma": "",
+"top": [
+"Monte Albán",
+"Hierve el Agua",
+"Mercado 20 de Noviembre",
+"Mezcalerías y cocina oaxaqueña"
+],
+"tip": "Si quieres vivir el Día de Muertos, reserva con meses de anticipación: se llena.",
+"d": "Mercados, mezcal y tradición viva. Un viaje para comer, caminar y descubrir cultura en cada esquina."
+},
+{
+"id": "sc",
+"n": "San Cristóbal",
+"t": "cultura aventura tranquilo",
+"c": 1100,
+"k": "San_Cristóbal_de_las_Casas",
+"i": 0,
+"cc": "",
+"pais": "México",
+"epoca": "Nov–mar",
+"dur": "3–4 días",
+"idioma": "",
+"top": [
+"Cañón del Sumidero",
+"Andador Guadalupano",
+"Templo de Santo Domingo y mercado de artesanías",
+"Lagunas de Montebello"
+],
+"tip": "Lleva abrigo: en las noches hace frío incluso en temporada seca.",
+"d": "Pueblo mágico entre montañas, cafés y artesanías. Muy tranquilo y con naturaleza cerca."
+},
+{
+"id": "gto",
+"n": "Guanajuato",
+"t": "cultura romantico tranquilo",
+"c": 1200,
+"k": "Guanajuato_(Guanajuato)",
+"i": 0,
+"cc": "",
+"pais": "México",
+"epoca": "Oct–abr",
+"dur": "2–3 días",
+"idioma": "",
+"top": [
+"Callejón del Beso",
+"Monumento al Pípila",
+"Teatro Juárez",
+"Calles subterráneas"
+],
+"tip": "El centro se recorre a pie: hospédate dentro del centro histórico y olvídate del auto.",
+"d": "Callejones de colores, túneles y leyendas. Una ciudad romántica y fácil de recorrer."
+},
+{
+"id": "tul",
+"n": "Tulum",
+"t": "playa romantico aventura",
+"c": 2400,
+"k": "Tulum",
+"i": 0,
+"cc": "",
+"pais": "México",
+"epoca": "Nov–abr",
+"dur": "3–5 días",
+"idioma": "",
+"top": [
+"Zona arqueológica frente al mar",
+"Cenotes",
+"Playas de la zona hotelera",
+"Reserva Sian Ka'an"
+],
+"tip": "En algunos meses llega sargazo a las playas: revisa el reporte antes de viajar.",
+"d": "Ruinas frente al mar, cenotes y hoteles boutique. Naturaleza y relax en el Caribe."
+},
+{
+"id": "bac",
+"n": "Bacalar",
+"t": "tranquilo romantico playa",
+"c": 1500,
+"k": "Bacalar",
+"i": 0,
+"cc": "",
+"pais": "México",
+"epoca": "Nov–may",
+"dur": "2–3 días",
+"idioma": "",
+"top": [
+"Laguna de los siete colores",
+"Cenote Azul",
+"Canal de los Piratas",
+"Fuerte de San Felipe"
+],
+"tip": "Usa bloqueador biodegradable: ayudas a cuidar la laguna.",
+"d": "La laguna de los siete colores. Calma total para desconectarte, navegar en kayak y descansar."
+},
+{
+"id": "cdmx",
+"n": "Ciudad de México",
+"t": "cultura gastronomia familia",
+"c": 1500,
+"k": "Ciudad_de_México",
+"i": 0,
+"cc": "",
+"pais": "México",
+"epoca": "Mar–may y oct–nov",
+"dur": "3–5 días",
+"idioma": "",
+"top": [
+"Centro Histórico y Zócalo",
+"Museo Nacional de Antropología",
+"Coyoacán y Xochimilco",
+"Tacos y mercados"
+],
+"tip": "Muévete en Metro y Metrobús: es rápido y económico.",
+"d": "Museos, tacos y barrios con historia. Siempre hay un plan nuevo por descubrir."
+},
+{
+"id": "mty",
+"n": "Monterrey",
+"t": "aventura familia",
+"c": 1600,
+"k": "Monterrey",
+"i": 0,
+"cc": "",
+"pais": "México",
+"epoca": "Oct–abr",
+"dur": "2–3 días",
+"idioma": "",
+"top": [
+"Parque Fundidora",
+"Paseo Santa Lucía",
+"Cerro de la Silla",
+"Grutas de García"
+],
+"tip": "En verano el calor es fuerte: elige otoño o primavera.",
+"d": "Montañas, parques y buena comida norteña. Aventura urbana para toda la familia."
+},
+{
+"id": "lap",
+"n": "La Paz",
+"t": "playa tranquilo aventura",
+"c": 1700,
+"k": "La_Paz_(Baja_California_Sur)",
+"i": 0,
+"cc": "",
+"pais": "México",
+"epoca": "Nov–jun",
+"dur": "3–5 días",
+"idioma": "",
+"top": [
+"Playa Balandra",
+"Isla Espíritu Santo",
+"Nado con lobos marinos",
+"Malecón de La Paz"
+],
+"tip": "Balandra tiene cupo diario limitado: llega temprano.",
+"d": "Aguas tranquilas, lobos marinos y playas casi vacías. Una joya de Baja California Sur."
+},
+{
+"id": "nyc",
+"n": "Nueva York",
+"t": "cultura gastronomia familia",
+"c": 5500,
+"k": "Nueva_York",
+"i": 1,
+"cc": "US",
+"pais": "Estados Unidos",
+"epoca": "Abr–jun y sep–nov",
+"dur": "5–7 días",
+"idioma": "Inglés · dólar (USD)",
+"top": [
+"Central Park",
+"Estatua de la Libertad",
+"Times Square y Broadway",
+"Museos: MET y MoMA"
+],
+"tip": "Compra con anticipación las entradas a museos y miradores para evitar filas.",
+"d": "La ciudad que nunca duerme: rascacielos, museos de clase mundial y comida de todo el planeta."
+},
+{
+"id": "lv",
+"n": "Las Vegas",
+"t": "aventura gastronomia familia",
+"c": 4200,
+"k": "Las_Vegas",
+"i": 1,
+"cc": "US",
+"pais": "Estados Unidos",
+"epoca": "Mar–may y oct–nov",
+"dur": "3–4 días",
+"idioma": "Inglés · dólar (USD)",
+"top": [
+"El Strip de noche",
+"Fuentes del Bellagio",
+"Shows y espectáculos",
+"Excursión al Gran Cañón o al Valle de la Muerte"
+],
+"tip": "En verano hace muchísimo calor: primavera y otoño son más cómodos.",
+"d": "Hoteles temáticos, shows y desierto a un paso. Perfecta para una escapada intensa."
+},
+{
+"id": "par",
+"n": "París",
+"t": "romantico cultura gastronomia",
+"c": 4800,
+"k": "París",
+"i": 1,
+"cc": "FR",
+"pais": "Francia",
+"epoca": "Abr–jun y sep–oct",
+"dur": "5–7 días",
+"idioma": "Francés · euro (EUR)",
+"top": [
+"Torre Eiffel",
+"Museo del Louvre",
+"Montmartre y Sacré-Cœur",
+"Paseo en barco por el Sena"
+],
+"tip": "Reserva con horario el Louvre y la Torre Eiffel: sin boleto previo la espera es larga.",
+"d": "Cafés, museos y atardeceres junto al Sena. El clásico destino romántico."
+},
+{
+"id": "mad",
+"n": "Madrid",
+"t": "cultura gastronomia familia",
+"c": 3600,
+"k": "Madrid",
+"i": 1,
+"cc": "ES",
+"pais": "España",
+"epoca": "Mar–jun y sep–nov",
+"dur": "4–5 días",
+"idioma": "Español · euro (EUR)",
+"top": [
+"Museo del Prado",
+"Parque del Retiro",
+"Palacio Real",
+"Tapas en La Latina"
+],
+"tip": "Los fines de semana el Rastro (mercadillo dominical) es un plan muy local.",
+"d": "Arte, tapas y vida de plaza a cualquier hora. Sin barrera de idioma para ti."
+},
+{
+"id": "bcn",
+"n": "Barcelona",
+"t": "playa cultura gastronomia",
+"c": 3800,
+"k": "Barcelona",
+"i": 1,
+"cc": "ES",
+"pais": "España",
+"epoca": "May–jun y sep–oct",
+"dur": "4–5 días",
+"idioma": "Español y catalán · euro (EUR)",
+"top": [
+"Sagrada Familia",
+"Parque Güell",
+"Barrio Gótico",
+"Playa de la Barceloneta"
+],
+"tip": "Compra con anticipación la entrada a la Sagrada Familia y al Parque Güell.",
+"d": "Gaudí, playa y tapas en una sola ciudad. Mezcla perfecta de cultura y mar."
+},
+{
+"id": "rom",
+"n": "Roma",
+"t": "romantico cultura gastronomia",
+"c": 4200,
+"k": "Roma",
+"i": 1,
+"cc": "IT",
+"pais": "Italia",
+"epoca": "Abr–jun y sep–oct",
+"dur": "4–5 días",
+"idioma": "Italiano · euro (EUR)",
+"top": [
+"Coliseo y Foro Romano",
+"Ciudad del Vaticano",
+"Fontana de Trevi",
+"Barrio Trastevere"
+],
+"tip": "Reserva el Coliseo y el Vaticano con horario, y ve temprano para evitar multitudes.",
+"d": "Historia en cada calle, pasta auténtica y plazas llenas de vida."
+},
+{
+"id": "lon",
+"n": "Londres",
+"t": "cultura familia",
+"c": 5600,
+"k": "Londres",
+"i": 1,
+"cc": "GB",
+"pais": "Reino Unido",
+"epoca": "May–sep",
+"dur": "5–6 días",
+"idioma": "Inglés · libra esterlina (GBP)",
+"top": [
+"Big Ben y Westminster",
+"Museo Británico (entrada gratuita)",
+"Torre de Londres",
+"Camden y Borough Market"
+],
+"tip": "Muévete con tarjeta contactless en el metro: suele salir más barato que boletos sencillos.",
+"d": "Palacios, museos gratuitos y pubs con historia. Una ciudad cosmopolita y muy completa."
+},
+{
+"id": "tyo",
+"n": "Tokio",
+"t": "cultura gastronomia aventura",
+"c": 4500,
+"k": "Tokio",
+"i": 1,
+"cc": "JP",
+"pais": "Japón",
+"epoca": "Mar–abr (cerezos) y oct–nov",
+"dur": "7–10 días",
+"idioma": "Japonés · yen (JPY)",
+"top": [
+"Cruce de Shibuya y Shinjuku",
+"Templo Senso-ji",
+"Mercado de Tsukiji",
+"Excursión al monte Fuji"
+],
+"tip": "Compra una tarjeta recargable de transporte al llegar: el sistema de trenes es muy eficiente.",
+"d": "Tradición y futuro conviviendo. Comida increíble, templos y barrios llenos de luces."
+},
+{
+"id": "bue",
+"n": "Buenos Aires",
+"t": "cultura gastronomia romantico",
+"c": 2600,
+"k": "Buenos_Aires",
+"i": 1,
+"cc": "AR",
+"pais": "Argentina",
+"epoca": "Mar–may y sep–nov",
+"dur": "4–6 días",
+"idioma": "Español · peso argentino (ARS)",
+"top": [
+"Recoleta y Palermo",
+"La Boca y Caminito",
+"Show de tango",
+"Parrillas y cafés en San Telmo"
+],
+"tip": "Consulta el tipo de cambio antes de viajar: los precios para turistas pueden variar mucho.",
+"d": "Tango, carne y librerías preciosas. Una capital europea en Sudamérica y en español."
+},
+{
+"id": "cus",
+"n": "Cusco",
+"t": "aventura cultura",
+"c": 2200,
+"k": "Cuzco",
+"i": 1,
+"cc": "PE",
+"pais": "Perú",
+"epoca": "May–sep (temporada seca)",
+"dur": "4–6 días",
+"idioma": "Español y quechua · sol peruano (PEN)",
+"top": [
+"Machu Picchu",
+"Valle Sagrado",
+"Sacsayhuamán",
+"Plaza de Armas"
+],
+"tip": "Cusco está a unos 3,400 m: aclimátate 1 o 2 días antes de hacer caminatas. Reserva Machu Picchu con anticipación.",
+"d": "Capital del imperio inca: ruinas, montañas y mercados con mucha historia."
+},
+{
+"id": "dxb",
+"n": "Dubái",
+"t": "aventura familia playa",
+"c": 5000,
+"k": "Dubái",
+"i": 1,
+"cc": "AE",
+"pais": "Emiratos Árabes Unidos",
+"epoca": "Nov–mar (el verano es extremo)",
+"dur": "4–5 días",
+"idioma": "Árabe e inglés · dírham (AED)",
+"top": [
+"Burj Khalifa",
+"Safari en el desierto",
+"Dubai Mall y fuentes",
+"Palm Jumeirah"
+],
+"tip": "Respeta las normas locales de vestimenta y conducta en lugares públicos y religiosos.",
+"d": "Rascacielos, desierto y playas de lujo. Un destino futurista para vivir de todo."
+},
+{
+"id": "ist",
+"n": "Estambul",
+"t": "cultura gastronomia romantico",
+"c": 2800,
+"k": "Estambul",
+"i": 1,
+"cc": "TR",
+"pais": "Turquía",
+"epoca": "Abr–may y sep–nov",
+"dur": "4–5 días",
+"idioma": "Turco · lira turca (TRY)",
+"top": [
+"Santa Sofía",
+"Mezquita Azul",
+"Gran Bazar",
+"Paseo en barco por el Bósforo"
+],
+"tip": "Sube a un ferry por el Bósforo: es barato y una de las mejores vistas de la ciudad.",
+"d": "Una ciudad entre dos continentes: mezquitas, bazares y atardeceres sobre el Bósforo."
+}
+];
+const $=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"']/g,c=>"&#"+c.charCodeAt(0)+";"),g=$("egrid"),F=$("filters"),R=$("regs"),CN=$("cnt");
+const TAGS=["todos","playa","romantico","tranquilo","aventura","familia","cultura","gastronomia"],LAB={romantico:"romántico",gastronomia:"gastronomía",todos:"todos los estilos"},REG=[["todos","🌎 Todos"],["mx","🇲🇽 México"],["intl","✈️ Internacional"]];
+let reg="todos",tag="todos";
+R.innerHTML=REG.map(([k,l],i)=>`<button data-r="${k}" class="${i?"":"on"}">${l}</button>`).join("");
 F.innerHTML=TAGS.map((t,i)=>`<button data-t="${t}" class="${i?"":"on"}">${LAB[t]||t}</button>`).join("");
-function paint(tag){
-  g.innerHTML=D.filter(d=>tag=="todos"||d.t.includes(tag)).map(d=>`<article class="ecard"><div class="eim" data-w="${esc(d.k)}"><span>📍</span><b>Desde $${d.c.toLocaleString("es-MX")}/día</b></div><div class="ebd"><h4>${esc(d.n)}</h4><div class="tg">${d.t.split(" ").map(t=>`<span>${esc(LAB[t]||t)}</span>`).join("")}</div><p>${esc(d.d)}</p><a class="btn" href="index.html?reservar=${d.id}"><i data-lucide="calendar-check"></i> Reservar</a></div></article>`).join("");
+const card=d=>`<article class="ecard"><div class="eim" data-w="${esc(d.k)}"><span>${d.i?"🌍":"📍"}</span><b>Desde ≈ $${d.c.toLocaleString("es-MX")}/día</b></div><div class="ebd"><h4>${esc(d.n)}</h4><div class="tg"><span>${esc(d.pais)}</span>${d.t.split(" ").map(t=>`<span>${esc(LAB[t]||t)}</span>`).join("")}</div><p>${esc(d.d)}</p><div class="facts"><span>🗓 <b>Mejor época:</b> ${esc(d.epoca)}</span><span>⏱ <b>Ideal:</b> ${esc(d.dur)}</span></div><details><summary>Más información</summary><div class="more"><div><b>Imperdibles</b><ul>${d.top.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>${d.i?`<span>💬 <b>Idioma y moneda:</b> ${esc(d.idioma)}</span>`:`<span>💬 <b>Idioma y moneda:</b> Español · peso mexicano (MXN)</span>`}<span>💡 <b>Consejo:</b> ${esc(d.tip)}</span><span>💰 Costo diario aproximado por persona, sin incluir vuelo. El total final depende de tus fechas y de las tarifas disponibles.</span>${d.i?`<div class="note">🛂 Necesitas pasaporte vigente. Revisa los requisitos de entrada (visa o autorización electrónica) del país antes de reservar.</div>`:""}</div></details><a class="btn" href="index.html?reservar=${d.id}"><i data-lucide="calendar-check"></i> Reservar</a></div></article>`;
+function paint(){
+  const l=D.filter(d=>(reg=="todos"||(reg=="intl")==!!d.i)&&(tag=="todos"||d.t.includes(tag)));
+  CN.textContent=l.length?`${l.length} destino${l.length>1?"s":""}`:"";
+  g.innerHTML=l.length?l.map(card).join(""):'<p class="cnt">No hay destinos con esa combinación. Prueba otro estilo.</p>';
   window.lucide?.createIcons();
   g.querySelectorAll(".eim").forEach(async el=>{try{const j=await(await fetch("https://es.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(el.dataset.w))).json(),u=j.thumbnail?.source;if(u){const i=new Image();i.alt="";i.onload=()=>{el.querySelector("span")?.remove();el.prepend(i)};i.src=u}}catch{}});
 }
-F.onclick=e=>{const b=e.target.closest("button");if(!b)return;F.querySelectorAll("button").forEach(x=>x.classList.toggle("on",x==b));paint(b.dataset.t)};
-paint("todos");
+R.onclick=e=>{const b=e.target.closest("button");if(!b)return;reg=b.dataset.r;R.querySelectorAll("button").forEach(x=>x.classList.toggle("on",x==b));paint()};
+F.onclick=e=>{const b=e.target.closest("button");if(!b)return;tag=b.dataset.t;F.querySelectorAll("button").forEach(x=>x.classList.toggle("on",x==b));paint()};
+paint();
 </script>
 </body>
 </html>
