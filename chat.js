@@ -103,7 +103,7 @@ function local(t){const n=nz(t),s=t.length<40,m=mood(t);let x;if(!s||/internacio
  if(/^aun no se( la fecha)?$/.test(n)&&!S.start)return()=>set("start","x");
  if(x=parseD(n))return()=>setStart(x);
  if(/^\$?\s?0$|^(gratis|nada|cero)$/.test(n))return()=>set("budget",0);
- if(x=t.match(/\$\s?([\d,]{3,})/))return()=>set("budget",+x[1].replace(/,/g,""));
+ if(x=t.match(/^(?:💵\s*)?\$\s?([\d,]{3,})(?:\s*(?:pesos|mxn))?$/i))return()=>set("budget",+x[1].replace(/,/g,""));
  if(x=n.match(/^(\d{1,2}) dias?$/))return()=>set("days",+x[1]);
  if(x=n.match(/^(\d{1,2}|una?|dos) semanas?$/))return()=>set("days",7*({un:1,una:1,dos:2}[x[1]]||+x[1]));
  if(x=t.match(/^📍\s*(.+)$/u))return()=>set("origin",x[1]);
@@ -121,7 +121,13 @@ function local(t){const n=nz(t),s=t.length<40,m=mood(t);let x;if(!s||/internacio
  if(m)return()=>{bot(/barato|econom/.test(m)?"Los destinos más económicos 💰":"Estas opciones te pueden gustar ✨");sug(m,/barato|econom/.test(m))}}
 
 function show(r){r.dbg&&console.warn("Gemini:",r.dbg);bot(r.say||"…");
- const lu=[...S.hist].reverse().find(m=>m.r=="u")?.t||"",up=(k,v)=>(v||(k=="budget"&&v===0&&S.budget==null&&/\b0\b|gratis|cero|nada/i.test(lu)))&&v!=S[k]&&set(k,v),i=r.intent;up("dest",r.dest);up("days",r.days);up("budget",r.budget);up("origin",r.origin);{const st=/^\d{4}-\d{2}-\d{2}$/.test(r.start||"")&&r.start>=today()?r.start:0;up("start",st);up("people",Math.min(Math.max(+r.people||0,0),20))}if(r.cost)S.cost=r.cost;if(/^[A-Za-z]{2}$/.test(r.cc||""))S.cc=r.cc.toUpperCase();if(r.mode&&r.mode!=S.mode){S.mode=r.mode;mode()}
+ const lu=[...S.hist].reverse().find(m=>m.r=="u")?.t||"",up=(k,v)=>(v||(k=="budget"&&v===0&&S.budget==null&&/\b0\b|gratis|cero|nada/i.test(lu)))&&v!=S[k]&&set(k,v),i=r.intent,nl=nz(lu),
+  dOK=/dias?|noches?|semanas?|fin de semana|puente|quincena|\d.*\bal\b.*\d/.test(nl),
+  bOK=/\d|\bmil\b|gratis|cero|nada|sin dinero/.test(nl),
+  sOK=/\d|manana|pasado|proxim|navidad|ano nuevo|semana santa|verano|enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre/.test(nl),
+  pOK=/\d|somos|\bsolo\b|\bsola\b|pareja|espos|novi[oa]|\b(dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez)\b/.test(nl);
+ up("dest",r.dest);up("days",dOK&&!PR.days&&!(S.days&&i=="plan")?r.days:0);up("budget",bOK&&!PR.budget?r.budget:undefined);up("origin",r.origin);
+ {const st=sOK&&/^\d{4}-\d{2}-\d{2}$/.test(r.start||"")&&r.start>=today()?r.start:0;up("start",st);up("people",pOK&&!PR.people?Math.min(Math.max(+r.people||0,0),20):0)}if(r.cost)S.cost=r.cost;if(/^[A-Za-z]{2}$/.test(r.cc||""))S.cc=r.cc.toUpperCase();if(r.mode&&r.mode!=S.mode){S.mode=r.mode;mode()}
  if(i=="plan"&&r.plan?.length&&cur()){set("plan",r.plan.slice(0,10).map(x=>({t:String(x.t||"").slice(0,90),p:String(x.p||"").slice(0,60),m:String(x.m||"").slice(0,160),a:String(x.a||"").slice(0,160),n:String(x.n||"").slice(0,160),c:x.c==null||!isFinite(+x.c)?null:Math.max(0,Math.round(+x.c))})));showPlan()}
  else if(i=="hotels"||i=="flights")showOpts(i=="hotels"?"hotel":"flight");
  else if(i=="route")goRoute();
@@ -147,8 +153,18 @@ function go(t,show){if(S.n++>40)return say("Llegaste al límite de mensajes de e
  say(show||t,1);S.hist.push({r:"u",t:t.slice(0,300)});sh=null;
  if(S.askHome){const g=/ubicaci[oó]n actual/i.test(t);if(!g&&(nz(t).trim()==nz(S.origin||"")||t.trim().length<8)){bot("Necesito algo más específico para trazar tu ruta: tu colonia, calle o un punto de referencia 🏠 (ej. \"Metro Juanacatlán, CDMX\")");chips(["📡 Usar mi ubicación actual"]);save();return}
  S.askHome=0;S.home=/ubicaci[oó]n actual/i.test(t)?"gps":t.slice(0,120);bot(S.home=="gps"?"Perfecto, usaré tu ubicación actual 📡":`Anotado: sales desde ${S.home} 🏠`);goRoute();save();return}
- if(t.length>=40){let x;if(S.budget==null&&(x=t.match(/(?:con|presupuesto(?: de)?|\$)\s*\$?\s*(\d[\d,.]{3,})/i)))set("budget",+x[1].replace(/[,.]/g,""));if(!S.days&&(x=nz(t).match(/(\d{1,2})\s*dias?/)))set("days",+x[1]);if(!S.days&&(x=nz(t).match(/(\d{1,2}|una?|dos)\s*semanas?/)))set("days",7*({un:1,una:1,dos:2}[x[1]]||+x[1]))}
- const l=local(t);l?(l()!==0&&fin(),save()):ai()}
+  const l=local(t);l?(l()!==0&&fin(),save()):(pre(t),ai())}
+// Lee del texto lo que el usuario SÍ escribió (personas, presupuesto, días) sin depender de la IA.
+let PR={}; // campos que leímos directamente del texto del usuario en este mensaje
+function pre(t){const n=nz(t);let x,b=null;PR={};
+ if((x=n.match(/(\d{1,2})\s*(?:personas?|adultos|viajeros|pasajeros)/))||(x=n.match(/somos\s*(\d{1,2})\b/))){const v=Math.min(Math.max(+x[1],1),20);PR.people=1;if(v!=S.people)set("people",v)}
+ else if(/\b(solo yo|yo solo|viajo solo|viajo sola)\b/.test(n)&&(PR.people=1)&&S.people!=1)set("people",1);
+ if(x=n.match(/(\d+(?:[.,]\d+)?)\s*(?:mil|k)\b/))b=Math.round(parseFloat(x[1].replace(",","."))*1000);
+ else if(x=n.match(/(?:con|presupuesto(?: de)?|tenemos|tengo|\$)\s*\$?\s*(\d[\d,.]{2,})/))b=+x[1].replace(/[,.]/g,"");
+ if(b&&/por persona|cada (uno|quien)|c\/u/.test(n))b*=S.people||1;
+ if(b&&b>=100){PR.budget=1;if(b!=S.budget)set("budget",b)}
+ if(!S.days&&(x=n.match(/(\d{1,2})\s*dias?/))){PR.days=1;set("days",+x[1])}
+ if(!S.days&&(x=n.match(/(\d{1,2}|una?|dos)\s*semanas?/))){PR.days=1;set("days",7*({un:1,una:1,dos:2}[x[1]]||+x[1]))}}
 function send(t,show){gate(()=>go(t,show),"Inicia sesión para chatear con Book&Go IA ✨")}
 
 let rs;async function restore(){const u=window.bg?.auth.currentUser;if(!u||rs==u.uid)return;rs=u.uid;
