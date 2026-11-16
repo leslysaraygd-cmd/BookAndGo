@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Opiniones · Book&Go IA</title>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+:root{--side:#0b1020;--ink:#111827;--muted:#6b7280;--bg:#f8fafc;--card:#fff;--brand:#7c5cff;--brand2:#a855f7;--line:#e5e7eb;--chip:#e0edff;--chipt:#1d4ed8}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ink:#f1f5f9;--muted:#9ca3af;--bg:#0f172a;--card:#1e293b;--line:#334155;--chip:#1e3a8a;--chipt:#bfdbfe;color-scheme:dark}}
+*{box-sizing:border-box}
+svg.lucide{width:18px;height:18px;vertical-align:-3px;stroke-width:2}
+body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);display:flex;min-height:100vh}
+aside{width:277px;background:var(--side);color:#cbd5e1;padding:20px 19px;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.logo{font-size:26px;font-weight:700;color:#fff;margin:6px 0 16px}.logo b{color:#4f8cff}
+aside a{display:block;padding:11px 20px;border-radius:12px;color:#cbd5e1;text-decoration:none;cursor:pointer}
+aside a.on,aside a:hover{background:#1c2438;color:#fff}
+.promo{margin-top:auto;background:linear-gradient(160deg,#2e1065,#1e1b4b);border-radius:18px;padding:20px;text-align:center;color:#fff}
+.promo p{font-size:14px;color:#cbd5e1;margin:6px 0 12px}
+.btn{border:0;border-radius:999px;padding:12px 28px;color:#fff;font:inherit;font-size:16px;cursor:pointer;background:linear-gradient(90deg,var(--brand),var(--brand2));text-decoration:none;display:inline-block;text-align:center}
+main{flex:1;min-width:0}
+.hero{padding:48px 60px 64px;color:#fff;background:linear-gradient(180deg,#0b1020aa,#0b102066),url("banner.jpg") center/cover no-repeat}
+.hero h1{font-size:46px;line-height:1.1;margin:0 0 14px}.hero h1 span{color:#a78bfa}
+.hero p{max-width:640px;opacity:.9;font-size:18px;margin:0}
+.chip{display:inline-block;background:var(--chip);color:var(--chipt);font-size:13px;padding:6px 18px;border-radius:99px;margin-bottom:16px}
+section{padding:40px 60px 100px}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px}
+.filters button{border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:8px 18px;font:inherit;font-size:14px;cursor:pointer;text-transform:capitalize}
+.filters button.on{background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;border-color:transparent}
+.egrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:24px}
+.ecard{background:var(--card);border-radius:20px;overflow:hidden;box-shadow:0 4px 14px #0001;display:flex;flex-direction:column;transition:.2s}.ecard:hover{transform:translateY(-4px);box-shadow:0 12px 28px #0002}
+.eim{height:170px;position:relative;background:linear-gradient(135deg,var(--brand),var(--brand2));display:grid;place-items:center;font-size:44px}.eim img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.eim b{position:absolute;right:10px;top:10px;z-index:1;background:#000a;color:#fff;border-radius:99px;padding:4px 12px;font-size:12px;font-weight:600}
+.ebd{padding:18px;display:flex;flex-direction:column;gap:10px;flex:1}.ecard h4{margin:0;font-size:19px}.ecard p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
+.tg{display:flex;gap:6px;flex-wrap:wrap}.tg span{background:var(--chip);color:var(--chipt);font-size:12px;padding:3px 10px;border-radius:99px;text-transform:capitalize}
+.ecard .btn{margin-top:auto;width:100%;padding:11px 16px;font-size:15px}
+.filters.reg{margin-bottom:12px}.filters.reg button{font-weight:600}
+.egrid{align-items:start}
+.facts{display:grid;gap:4px;font-size:13px;color:var(--muted)}.facts b{color:var(--ink);font-weight:600}
+details{border-top:1px solid var(--line);padding-top:10px}summary{cursor:pointer;font-size:14px;font-weight:600;color:var(--brand);list-style:none}summary::-webkit-details-marker{display:none}summary::after{content:" ▾"}details[open] summary::after{content:" ▴"}
+details ul{margin:10px 0 0;padding-left:18px;font-size:13px;color:var(--muted);line-height:1.6}
+details .more{display:grid;gap:8px;margin-top:10px;font-size:13px;color:var(--muted);line-height:1.5}details .more b{color:var(--ink)}
+.note{background:var(--chip);color:var(--chipt);border-radius:12px;padding:8px 12px;font-size:12.5px;line-height:1.45}
+.cnt{color:var(--muted);font-size:14px;margin:0 0 18px}
+@media(max-width:860px){body{flex-direction:column}aside{width:100%;height:auto;position:static;flex-direction:row;flex-wrap:wrap;align-items:center;padding:12px 16px}.logo{margin:0 auto 0 0;font-size:22px}.promo{display:none}.hero{padding:32px 22px 44px}.hero h1{font-size:34px}section{padding:28px 22px 80px}}
+
+.sum{display:grid;grid-template-columns:260px 1fr;gap:28px;background:var(--card);border-radius:24px;padding:26px 30px;box-shadow:0 4px 14px #0001;margin-bottom:28px;align-items:center}
+.big{text-align:center}.big b{font-size:60px;line-height:1;display:block;background:linear-gradient(90deg,var(--brand),var(--brand2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.big .st{color:#f59e0b;display:flex;justify-content:center;gap:2px;margin:8px 0 4px}.big small{color:var(--muted)}
+.bars{display:grid;gap:7px}.bar{display:grid;grid-template-columns:28px 1fr 34px;gap:10px;align-items:center;font-size:13px;color:var(--muted)}
+.bar i{display:block;height:9px;border-radius:99px;background:var(--line);overflow:hidden}.bar i u{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand2));border-radius:99px;text-decoration:none}
+.fbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.fbar button{border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:9px 18px;font:inherit;font-size:14px;cursor:pointer;display:inline-flex;gap:8px;align-items:center;transition:.15s}
+.fbar button:hover{border-color:var(--brand)}
+.fbar button.on{background:linear-gradient(90deg,var(--brand),var(--brand2));color:#fff;border-color:transparent}
+.fbar button em{font-style:normal;font-size:12px;background:#0001;border-radius:99px;padding:1px 8px}.fbar button.on em{background:#fff3}
+.fbar select{margin-left:auto;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:9px 16px;font:inherit;font-size:14px}
+.cnt{color:var(--muted);font-size:14px;margin:14px 0 20px}
+.og{columns:3 290px;column-gap:22px}
+.op{break-inside:avoid;margin:0 0 22px;background:var(--card);border-radius:22px;overflow:hidden;box-shadow:0 6px 20px #0001;position:relative;transition:.2s}
+.op:hover{transform:translateY(-4px);box-shadow:0 14px 32px #0002}
+.op .pic{display:block;width:100%;max-height:300px;object-fit:cover;cursor:zoom-in}
+.op .body{padding:18px 20px 20px}
+.op .stars{display:flex;gap:2px;color:#f59e0b}
+.op p{margin:10px 0 14px;line-height:1.6;font-size:15px;opacity:.9;white-space:pre-line;word-break:break-word}
+.who{display:flex;align-items:center;gap:10px}
+.av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand2)) center/cover;color:#fff;display:grid;place-items:center;font-weight:700;flex-shrink:0}
+.tag{position:absolute;top:12px;left:12px;z-index:2;font-size:12px;font-weight:700;padding:4px 12px;border-radius:99px;color:#fff}
+.tag.g{background:#16a34a}.tag.m{background:#d97706}.tag.b{background:#dc2626}
+.empty{text-align:center;color:var(--muted);padding:50px 20px;background:var(--card);border-radius:20px}
+#lb{border:0;background:transparent;padding:0;max-width:92vw;overflow:visible}#lb::backdrop{background:#000d}#lb img{max-width:92vw;max-height:90vh;border-radius:14px;display:block}
+.top{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+.top .btn{text-decoration:none}
+@media(max-width:860px){.sum{grid-template-columns:1fr}.fbar select{margin-left:0}}
+</style>
+</head>
+<body>
+<aside>
+  <div class="logo"><i data-lucide="compass" style="width:28px;height:28px;color:#4f8cff"></i> Book&amp;Go <b>IA</b></div>
+  <a href="index.html"><i data-lucide="home"></i> Inicio</a>
+  <a href="explorar.html"><i data-lucide="compass"></i> Explorar</a>
+  <a href="itinerarios.html"><i data-lucide="map"></i> Itinerarios</a>
+  <a href="misviajes.html"><i data-lucide="briefcase"></i> Mis Viajes</a>
+  <a class="on" href="opiniones.html"><i data-lucide="star"></i> Opiniones</a>
+  <div class="promo">
+    <b>¿Ya viajaste con nosotros?</b>
+    <p>Cuéntanos cómo te fue y sube una foto de tu viaje.</p>
+    <a class="btn" href="index.html?opinar=1">Dejar mi opinión</a>
+  </div>
+</aside>
+<main>
+  <div class="hero">
+    <span class="chip">OPINIONES</span>
+    <h1>Lo que dicen <span>nuestros viajeros</span></h1>
+    <p>Todas las experiencias de la comunidad. Filtra por buenas, malas, con foto o sin foto.</p>
+    <div class="top"><a class="btn" href="index.html?opinar=1">Dejar mi opinión ✎</a></div>
+  </div>
+  <section>
+    <div class="sum" id="sum" hidden>
+      <div class="big"><b id="avg">–</b><div class="st" id="avgst"></div><small id="tot"></small></div>
+      <div class="bars" id="bars"></div>
+    </div>
+    <div class="fbar" id="fb">
+      <button data-f="all" class="on">Todas <em id="c-all">0</em></button>
+      <button data-f="good">👍 Buenas (4-5★) <em id="c-good">0</em></button>
+      <button data-f="mid">😐 Regulares (3★) <em id="c-mid">0</em></button>
+      <button data-f="bad">👎 Malas (1-2★) <em id="c-bad">0</em></button>
+      <button data-f="pic">📷 Con foto <em id="c-pic">0</em></button>
+      <button data-f="nopic">Sin foto <em id="c-nopic">0</em></button>
+      <select id="sort" aria-label="Ordenar"><option value="new">Más recientes</option><option value="best">Mejor calificadas</option><option value="worst">Peor calificadas</option></select>
+    </div>
+    <p class="cnt" id="cnt">Cargando opiniones…</p>
+    <div class="og" id="og"></div>
+  </section>
+</main>
+<dialog id="lb"><img id="lbi" alt="Foto del viaje"></dialog>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getDatabase,ref,query,orderByChild,limitToLast,onValue} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+const db=getDatabase(initializeApp({apiKey:"AIzaSyBY0KCEgBwrKV02kiFTGZLtWOxO9ozzSso",authDomain:"bookandgo-ad08d.firebaseapp.com",databaseURL:"https://bookandgo-ad08d-default-rtdb.firebaseio.com",projectId:"bookandgo-ad08d",storageBucket:"bookandgo-ad08d.firebasestorage.app",messagingSenderId:"772819367761",appId:"1:772819367761:web:5fdf584737cf2ea3ad8570"}));
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const star=on=>`<svg width="16" height="16" viewBox="0 0 24 24" fill="${on?"currentColor":"none"}" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+const okImg=f=>/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(f||"");
+const okAv=f=>/^(data:image\/|https:\/\/)/.test(f||"");
+let all=[],filter="all";
+const tests={all:()=>true,good:o=>o.rating>=4,mid:o=>o.rating===3,bad:o=>o.rating<=2,pic:o=>okImg(o.imagen),nopic:o=>!okImg(o.imagen)};
+const names={all:"opiniones",good:"opiniones buenas",mid:"opiniones regulares",bad:"opiniones malas",pic:"opiniones con foto",nopic:"opiniones sin foto"};
+function stats(){
+  for(const k in tests)$("c-"+k).textContent=all.filter(tests[k]).length;
+  $("sum").hidden=!all.length;if(!all.length)return;
+  const avg=all.reduce((a,o)=>a+o.rating,0)/all.length;
+  $("avg").textContent=avg.toFixed(1);
+  $("avgst").innerHTML=[1,2,3,4,5].map(i=>star(avg>=i-.25)).join("");
+  $("tot").textContent=`${all.length} opinion${all.length===1?"":"es"}`;
+  $("bars").innerHTML=[5,4,3,2,1].map(n=>{const c=all.filter(o=>o.rating===n).length;return `<div class="bar"><span>${n} ★</span><i><u style="width:${c/all.length*100}%"></u></i><span>${c}</span></div>`}).join("");
+}
+function render(){
+  let l=all.filter(tests[filter]);const s=$("sort").value;
+  if(s==="best")l=[...l].sort((a,b)=>b.rating-a.rating);if(s==="worst")l=[...l].sort((a,b)=>a.rating-b.rating);
+  $("cnt").textContent=`${l.length} ${names[filter]}`;
+  const el=$("og");
+  if(!l.length){el.className="";el.innerHTML='<div class="empty">No hay opiniones en esta categoría todavía.</div>';return}
+  el.className="og";
+  el.innerHTML=l.map(o=>{const t=o.rating>=4?["g","Buena"]:o.rating===3?["m","Regular"]:["b","Mala"];
+    return `<article class="op"><span class="tag ${t[0]}">${t[1]}</span>${okImg(o.imagen)?`<img class="pic" alt="Foto del viaje" src="${o.imagen}">`:""}<div class="body" ${okImg(o.imagen)?"":'style="padding-top:44px"'}><div class="stars">${[1,2,3,4,5].map(i=>star(i<=o.rating)).join("")}</div><p>${esc(o.texto)}</p><div class="who"><span class="av"${okAv(o.foto)?` style="background-image:url('${esc(o.foto)}');color:transparent"`:""}>${esc((o.nombre||"?")[0].toUpperCase())}</span><strong>${esc(o.nombre)}</strong></div></div></article>`}).join("");
+  el.querySelectorAll("img.pic").forEach(i=>i.onclick=()=>{$("lbi").src=i.src;$("lb").showModal()});
+}
+$("fb").onclick=e=>{const b=e.target.closest("button[data-f]");if(!b)return;filter=b.dataset.f;document.querySelectorAll("#fb button").forEach(x=>x.classList.toggle("on",x===b));render()};
+$("sort").onchange=render;
+$("lb").onclick=()=>$("lb").close();
+onValue(query(ref(db,"opiniones"),orderByChild("creado"),limitToLast(300)),
+ s=>{const a=[];s.forEach(d=>{a.push({id:d.key,...d.val()})});
+  all=a.filter(o=>o&&typeof o.texto==="string"&&o.texto&&typeof o.nombre==="string"&&o.nombre&&o.rating>=1&&o.rating<=5).reverse();stats();render()},
+ e=>{$("cnt").textContent="No se pudieron cargar las opiniones ("+(e.code||"error")+")."});
+window.lucide?.createIcons();
+</script>
+</body>
+</html>

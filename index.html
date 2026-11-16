@@ -194,7 +194,34 @@ body:not(.logged) .auth-only,body:not(.logged) .fab{display:none!important}
 .cc .bd{padding:12px;display:flex;flex-direction:column;gap:6px;flex:1}.cc h4{margin:0;font-size:16px}.cc p{margin:0;font-size:13px;color:var(--muted)}
 .bt2{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto}.cc button{flex:1;border:0;border-radius:10px;padding:8px;background:var(--brand);color:#fff;font:inherit;font-size:13px;cursor:pointer}.cc button:hover{background:var(--brand2)}.cc button:disabled{opacity:.6;cursor:default}
 .it{flex-shrink:0;background:var(--bg);border-radius:14px;padding:6px 14px;max-width:min(100%,560px);align-self:flex-start}.it div{display:flex;gap:12px;padding:9px 0;border-bottom:1px dashed var(--line)}.it div:last-child{border:0}.it b{color:var(--brand);white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
-.it button{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:10px;width:100%;border:0;border-radius:10px;padding:10px;background:var(--brand);color:#fff;font:inherit;cursor:pointer}.it button:disabled{opacity:.6}.it .ln{flex-wrap:wrap;border:0!important}.it a{flex:1;text-align:center;text-decoration:none;border-radius:10px;padding:9px;background:var(--brand);color:#fff;font-size:14px}</style>
+.it button{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:10px;width:100%;border:0;border-radius:10px;padding:10px;background:var(--brand);color:#fff;font:inherit;cursor:pointer}.it button:disabled{opacity:.6}.it .ln{flex-wrap:wrap;border:0!important}.it a{flex:1;text-align:center;text-decoration:none;border-radius:10px;padding:9px;background:var(--brand);color:#fff;font-size:14px}
+/* ---- Carrusel de opiniones ---- */
+.ops{margin:90px 0 0}.ops header{align-items:flex-end}
+.ops header .chip{margin-bottom:10px}
+.oact{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.oact .outline{text-decoration:none;padding:12px 26px;font-size:16px;white-space:nowrap}
+.oact .btn{white-space:nowrap}
+.stats{margin-top:70px}
+.car{position:relative;margin:26px -60px 0}
+.track{display:flex;gap:22px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:14px 60px 34px;scrollbar-width:none}
+.track::-webkit-scrollbar{display:none}
+.track .op{flex:0 0 min(340px,82vw);scroll-snap-align:center;padding:0;overflow:hidden;border-radius:24px;box-shadow:0 10px 30px #0002;transition:transform .25s,box-shadow .25s;position:relative;min-height:380px}
+.track .op:hover{transform:translateY(-6px);box-shadow:0 18px 40px #0003}
+.op .pic{height:190px;border-radius:0;margin:0;display:block;width:100%;object-fit:cover}
+.op .nopic{height:130px;display:grid;place-items:center;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#ffffff55;font-size:90px;font-family:Georgia,serif;line-height:1;padding-top:26px}
+.op .body{padding:18px 20px 20px;display:flex;flex-direction:column;flex:1}
+.op .body p{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;line-height:1.55;font-size:15px;color:var(--ink);opacity:.85}
+.op .badge{position:absolute;top:12px;right:12px;z-index:2;background:#000b;color:#fff;border-radius:99px;padding:4px 12px;font-size:13px;font-weight:700;display:flex;gap:5px;align-items:center}
+.op .badge svg{color:#fbbf24}
+.op .stars{display:flex;gap:2px}
+.cnav{position:absolute;top:50%;transform:translateY(-50%);z-index:5;width:46px;height:46px;border-radius:50%;border:0;background:var(--card);color:var(--ink);box-shadow:0 6px 20px #0004;cursor:pointer;display:grid;place-items:center;transition:.2s}
+.cnav:hover{background:var(--brand);color:#fff}
+#cprev{left:14px}#cnext{right:14px}
+.car:has(.load) .cnav{display:none}
+#pbtn{width:100%;border:2px dashed var(--brand)!important;color:var(--brand)!important;border-radius:14px!important;padding:18px!important;font-size:15px!important}
+#pbtn:hover{background:#7c5cff14}
+@media(max-width:900px){.car{margin:20px -20px 0}.track{padding:14px 20px 30px}.cnav{display:none}.ops{margin-top:80px}.ops h3{font-size:24px}}
+</style>
 </head>
 <body>
 <aside>
@@ -203,7 +230,7 @@ body:not(.logged) .auth-only,body:not(.logged) .fab{display:none!important}
   <a href="explorar.html"><i data-lucide="compass"></i> Explorar</a>
   <a href="itinerarios.html"><i data-lucide="map"></i> Itinerarios</a>
   <a class="auth-only" id="nTrips" href="misviajes.html"><i data-lucide="briefcase"></i> Mis Viajes</a>
-  <a><i data-lucide="star"></i> Opiniones</a>
+  <a href="opiniones.html"><i data-lucide="star"></i> Opiniones</a>
   <a class="auth-only" id="nProf"><i data-lucide="user"></i> Perfil</a>
   <a><i data-lucide="settings"></i> Configuración</a>
   <a><i data-lucide="shield"></i> Panel de Administración</a>
@@ -241,6 +268,17 @@ body:not(.logged) .auth-only,body:not(.logged) .fab{display:none!important}
     </form>
   </div>
   <section>
+    <div class="ops" id="opiniones">
+      <header>
+        <div><span class="chip">OPINIONES</span><h3>Lo que dicen nuestros viajeros</h3></div>
+        <div class="oact"><a class="outline" href="opiniones.html">Ver todas →</a><button class="btn" id="addop">Dejar mi opinión ✎</button></div>
+      </header>
+      <div class="car">
+        <button class="cnav" id="cprev" aria-label="Anterior"><i data-lucide="chevron-left"></i></button>
+        <div id="ops" class="load">Cargando opiniones…</div>
+        <button class="cnav" id="cnext" aria-label="Siguiente"><i data-lucide="chevron-right"></i></button>
+      </div>
+    </div>
     <div class="stats">
       <div class="stat"><b>500+</b><strong>Viajeros felices</strong><br><small>Personas que ya vivieron la experiencia Book&amp;Go AI</small></div>
       <div class="stat"><b>120+</b><strong>Destinos increíbles</strong><br><small>Lugares únicos en todo el mundo para explorar</small></div>
@@ -259,10 +297,6 @@ body:not(.logged) .auth-only,body:not(.logged) .fab{display:none!important}
         <div><div class="ico"><i data-lucide="tag"></i></div><h4>Mejores precios</h4><p>Encontramos y comparamos las opciones más amigables para tu cartera.</p></div>
         <div><div class="ico"><i data-lucide="shield-check"></i></div><h4>Viaje seguro</h4><p>Recomendaciones 100% confiables y soporte 24/7 durante toda tu aventura.</p></div>
       </div>
-    </div>
-    <div class="ops">
-      <header><h3>Lo que dicen nuestros viajeros</h3><button class="outline" id="addop">Dejar mi opinión ✎</button></header>
-      <div id="ops" class="load">Cargando opiniones…</div>
     </div>
   </section>
 </main>
@@ -504,6 +538,7 @@ $("nProf").onclick=()=>$("pfm").showModal();
 const q=new URLSearchParams(location.search);
 if(q.has("reservar")){const id=q.get("reservar");history.replaceState(null,"",location.pathname);after=()=>{preset();openChat();pickDest(id)};pend="Inicia sesión para reservar tu viaje ✨"}
 if(q.has("itinerario")){const id=q.get("itinerario");history.replaceState(null,"",location.pathname);after=async()=>{try{const u=auth.currentUser,s=await get(ref(db,`itinerarios/${u.uid}/${id}`));if(s.exists()){openChat();loadItin(s.val(),id)}}catch{}};pend="Inicia sesión para ver tu itinerario ✨"}
+if(q.has("opinar")){history.replaceState(null,"",location.pathname);after=()=>$("addop").click();pend="Inicia sesión para dejar tu opinión ✍️"}
 if(q.has("verificado")||q.has("reset")){history.replaceState(null,"",location.pathname);view("fLogin");msg(q.has("reset")?"Contraseña actualizada. Inicia sesión con la nueva.":"¡Correo confirmado! Inicia sesión para continuar.",1);dlg.showModal()}
 
 // ---- Opiniones en Firestore ----
@@ -526,12 +561,21 @@ $("sx").onclick=$("sk").onclick=()=>$("sd").close();
 $("sd").addEventListener("click",e=>{if(e.target===$("sd"))$("sd").close()});
 const starSvg=on=>`<svg width="16" height="16" viewBox="0 0 24 24" fill="${on?"currentColor":"none"}" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
 function render(){
-  const el=$("ops");el.className="grid";
-  if(!ops.length){el.innerHTML='<div class="empty">Aún no hay opiniones. Sé la primera persona en dejar la suya.</div>';return}
-  el.innerHTML=ops.map(o=>`<div class="op">${o.imagen?`<img class="pic" alt="Foto del viaje" data-i="${esc(o.imagen)}">`:""}<div class="stars">${starSvg(1).repeat(o.rating)}${starSvg(0).repeat(5-o.rating)}</div><p>${esc(o.texto)}</p><div class="who"><span class="av" data-f="${esc(o.foto||"")}">${esc((o.nombre||"?")[0].toUpperCase())}</span><strong>${esc(o.nombre)}</strong></div></div>`).join("");
+  const el=$("ops");
+  if(!ops.length){el.className="load";el.innerHTML='Aún no hay opiniones. Sé la primera persona en dejar la suya.';return}
+  el.className="track";
+  el.innerHTML=ops.map(o=>`<article class="op"><div class="badge">${starSvg(1)} ${o.rating}.0</div>${o.imagen?`<img class="pic" alt="Foto del viaje" data-i="${esc(o.imagen)}">`:'<div class="nopic">“</div>'}<div class="body"><div class="stars" style="color:#f59e0b">${starSvg(1).repeat(o.rating)}${starSvg(0).repeat(5-o.rating)}</div><p>${esc(o.texto)}</p><div class="who"><span class="av" data-f="${esc(o.foto||"")}">${esc((o.nombre||"?")[0].toUpperCase())}</span><strong>${esc(o.nombre)}</strong></div></div></article>`).join("");
   el.querySelectorAll("[data-f]").forEach(a=>{const f=a.dataset.f;if(/^(data:image\/|https:\/\/)/.test(f)){a.style.backgroundImage=`url("${f}")`;a.textContent=""}});
-  el.querySelectorAll("img.pic").forEach(i=>{const f=i.dataset.i;if(/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(f)){i.src=f;i.onclick=()=>{$("lbi").src=f;$("lb").showModal()}}else i.remove()});
+  el.querySelectorAll("img.pic").forEach(i=>{const f=i.dataset.i;if(/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(f)){i.src=f;i.onclick=()=>{$("lbi").src=f;$("lb").showModal()}}else{const n=document.createElement("div");n.className="nopic";n.textContent="“";i.replaceWith(n)}});
 }
+// Carrusel: flechas + avance automático (se pausa al pasar el mouse o tocar)
+const step=()=>{const t=$("ops"),c=t.querySelector(".op");return c?c.offsetWidth+22:340};
+$("cprev").onclick=()=>$("ops").scrollBy({left:-step()});
+$("cnext").onclick=()=>{const t=$("ops");t.scrollLeft+t.clientWidth>=t.scrollWidth-20?t.scrollTo({left:0}):t.scrollBy({left:step()})};
+let hold=false;const car=document.querySelector(".car");
+["mouseenter","touchstart","focusin"].forEach(e=>car.addEventListener(e,()=>hold=true,{passive:true}));
+["mouseleave","touchend","focusout"].forEach(e=>car.addEventListener(e,()=>hold=false,{passive:true}));
+setInterval(()=>{if(!hold&&!document.hidden&&$("ops").classList.contains("track"))$("cnext").click()},4500);
 onValue(query(ref(db,"opiniones"),orderByChild("creado"),limitToLast(20)),
  s=>{const a=[];s.forEach(d=>{a.push({id:d.key,...d.val()})});ops=a.filter(o=>o&&typeof o.texto==="string"&&o.texto&&typeof o.nombre==="string"&&o.nombre&&o.rating>=1&&o.rating<=5).reverse();render()},
  e=>{$("ops").className="load";$("ops").textContent="No se pudieron cargar las opiniones ("+(e.code||"error")+")."});
