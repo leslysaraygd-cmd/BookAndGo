@@ -50,5 +50,5 @@ module.exports=async(req,res)=>{
       from:process.env.MAIL_FROM||"Book&Go IA <onboarding@resend.dev>",to:[u.email],subject,html,attachments:[{filename,content:pdf}]})});
     if(!r.ok){const j=await r.json().catch(()=>({}));console.error("resend",r.status,j);return res.status(502).json({err:String(j.message||r.status).slice(0,150)})}
     res.json({ok:1});
-  }catch(e){console.error(e);res.status(502).json({err:"envío"})}
+  }catch(e){console.error("ticket",e);res.status(502).json({err:String(e&&e.message||"envío").slice(0,150)})}
 };
