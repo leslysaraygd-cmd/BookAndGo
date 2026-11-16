@@ -247,6 +247,9 @@ let rs;async function restore(){const u=window.bg?.auth.currentUser;if(!u||rs==u
 
 // La página principal llama a preset() para empezar un viaje limpio (con las fechas del buscador, si las hay).
 window.preset=({start,end}={})=>{RS();if(start&&start>=today()){S.start=start;if(end&&end>=start)S.days=Math.min(Math.round((new Date(end)-new Date(start))/864e5)+1,30)}sync()};
+window.DESTS=D;
+// Desde "Explorar": deja el destino ya elegido y el chat sigue directo con la reserva (días, fechas, personas, hotel, vuelo y pago).
+window.pickDest=id=>{const d=D.find(x=>x.id==id);if(!d)return;set("dest",d.n);bot(`¡Elegiste ${d.n}! 🌴 Ya tengo el destino, vamos a armar tu reserva ✈️`);fin();save()};
 window.send=send;
 window.openChat=()=>{$("chat").classList.add("open");$("fab").style.display="none";$("ci").focus();restore()};
 $("fab").onclick=openChat;

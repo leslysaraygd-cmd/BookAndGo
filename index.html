@@ -200,7 +200,7 @@ body:not(.logged) .auth-only,body:not(.logged) .fab{display:none!important}
 <aside>
   <div class="logo"><i data-lucide="compass" style="width:28px;height:28px;color:#4f8cff"></i> Book&amp;Go <b>IA</b></div>
   <a class="on"><i data-lucide="home"></i> Inicio</a>
-  <a><i data-lucide="compass"></i> Explorar</a>
+  <a href="explorar.html"><i data-lucide="compass"></i> Explorar</a>
   <a><i data-lucide="map"></i> Itinerarios</a>
   <a class="auth-only" id="nTrips"><i data-lucide="briefcase"></i> Mis Viajes</a>
   <a><i data-lucide="star"></i> Opiniones</a>
@@ -414,7 +414,7 @@ const msg=(t,ok)=>document.querySelectorAll(".am").forEach(m=>{m.textContent=t;m
 const ERR={"auth/email-already-in-use":"Ese correo ya está registrado.","auth/invalid-credential":"Correo o contraseña incorrectos.","auth/weak-password":"La contraseña debe tener al menos 6 caracteres.","auth/invalid-email":"Correo no válido.","auth/too-many-requests":"Demasiados intentos, espera unos minutos.","auth/popup-closed-by-user":"Cerraste la ventana de Google.","auth/network-request-failed":"Sin conexión, revisa tu internet."};
 const fail=e=>msg(ERR[e.code]||"Error: "+e.code);
 
-let after=null;
+let after=null,pend=0;
 const VW=["fLogin","fReg","fForgot","vSent"];
 const view=v=>{VW.forEach(i=>$(i).hidden=i!=v);$("tabs").hidden=v=="fForgot"||v=="vSent";$("tL").classList.toggle("on",v=="fLogin");$("tR").classList.toggle("on",v=="fReg");msg("")};
 const busy=(b,on)=>b.disabled=!!on;
@@ -471,7 +471,7 @@ const sync=async u=>{
  const ok=u&&u.emailVerified;
  $("btnLogin").hidden=!!ok;$("um").hidden=!ok;
  document.body.classList.toggle("logged",!!ok);
- if(!ok){P={};$("x").click();return}
+ if(!ok){P={};$("x").click();if(after&&pend){pend=0;view("fLogin");msg("Inicia sesión para reservar tu viaje ✨",1);dlg.showModal()}return}
  try{P=(await get(ref(db,"usuarios/"+u.uid))).val()||{}}catch{P={}}
  show(u);
  const f=after;after=null;if(f){if(dlg.open)dlg.close();f()}
@@ -505,6 +505,7 @@ $("nProf").onclick=()=>$("pfm").showModal();
 $("nTrips").onclick=()=>$("trips").scrollIntoView({behavior:"smooth"});
 $("tripsBtn").onclick=()=>$("create").click();
 const q=new URLSearchParams(location.search);
+if(q.has("reservar")){const id=q.get("reservar");history.replaceState(null,"",location.pathname);after=()=>{preset();openChat();pickDest(id)};pend=1}
 if(q.has("verificado")||q.has("reset")){history.replaceState(null,"",location.pathname);view("fLogin");msg(q.has("reset")?"Contraseña actualizada. Inicia sesión con la nueva.":"¡Correo confirmado! Inicia sesión para continuar.",1);dlg.showModal()}
 
 // ---- Opiniones en Firestore ----
