@@ -64,6 +64,7 @@ section{padding:36px 60px 120px}
   <a href="index.html"><i data-lucide="home"></i> Inicio</a>
   <a href="explorar.html"><i data-lucide="compass"></i> Explorar</a>
   <a class="on" href="itinerarios.html"><i data-lucide="map"></i> Itinerarios</a>
+  <a href="misviajes.html"><i data-lucide="briefcase"></i> Mis Viajes</a>
   <div class="promo">
     <b>Planifica mejor con nuestra IA</b>
     <p>Tus itinerarios del chat se guardan aquí para que los ajustes cuando quieras.</p>
@@ -163,7 +164,7 @@ onAuthStateChanged(auth,async u=>{
   uid=u.uid;state("<p>Cargando tus itinerarios…</p>");
   try{const v=(await get(ref(db,`itinerarios/${uid}`))).val()||{};
     items={};for(const[id,x]of Object.entries(v)){const plan=arr(x.plan);if(x.dest&&plan.length)items[id]={...x,plan}}
-    renderList()}
+    renderList();const want=new URLSearchParams(location.search).get("id");if(want&&items[want])openDetail(want)}
   catch(err){console.warn("itinerarios:",err);state(`<h3>No pudimos cargar tus itinerarios</h3><p>Intenta de nuevo en unos minutos.</p><div class="acts"><button class="btn" onclick="location.reload()">Reintentar</button></div>`)}
 });
 icons();

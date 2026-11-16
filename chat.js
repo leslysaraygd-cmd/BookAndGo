@@ -218,11 +218,11 @@ function act(o,b){
  else if(o.a=="pdf"){const t=TK[o.id];t?dlTicket(t):bot("No encontré ese comprobante.")}
  else if(o.a=="pay"){if(used())pay();else act({a:"ok"},b)}
  else if(o.a=="ok"){b.disabled=true;b.textContent="Procesando pago…";const w=add("m dots","<span></span><span></span><span></span>");
-  setTimeout(async()=>{w.remove();const u=bg.auth.currentUser,c="BG-"+Math.random().toString(36).slice(2,8).toUpperCase();
-   bg.set(bg.ref(bg.db,`reservas/${u.uid}/${c}`),JSON.parse(JSON.stringify({dest:S.dest,days:S.days,origen:S.origin,hotel:S.hotel,vuelo:S.flight,plan:S.plan,total:used(),estado:"confirmada",pago:{demo:true,monto:used()},ts:Date.now()}))).catch(()=>{});
+  setTimeout(async()=>{w.remove();const u=bg.auth.currentUser,c="BG-"+Math.random().toString(36).slice(2,8).toUpperCase(),t0=used()?ticketData(c):null;
+   bg.set(bg.ref(bg.db,`reservas/${u.uid}/${c}`),JSON.parse(JSON.stringify({dest:S.dest,days:S.days,origen:S.origin,hotel:S.hotel,vuelo:S.flight,plan:S.plan,total:used(),start:S.start&&S.start!="x"?S.start:null,people:np(),budget:S.budget??null,iid:S.iid||null,tk:t0,estado:"confirmada",pago:{demo:true,monto:used()},ts:Date.now()}))).catch(()=>{});
    b.innerHTML=`${ICO.check} Pago confirmado`;
    bot(`Pago confirmado.\nCódigo de confirmación: ${c}\nDestino: ${S.dest} (${nts()} días · ${np()} pers.)\nTotal pagado: ${mx(used())}\nTu reserva quedó registrada en tu cuenta. Modo demostración: no se realizó ningún cargo real.`);
-   if(used()){const t=TK[c]=ticketData(c);add("it tk",`<div><b>${ICO.check} Comprobante</b><span>Código ${c}</span></div><button data-a="pdf" data-id="${c}">Descargar comprobante (PDF)</button>`);
+   if(used()){const t=TK[c]=t0||ticketData(c);add("it tk",`<div><b>${ICO.check} Comprobante</b><span>Código ${c}</span></div><button data-a="pdf" data-id="${c}">Descargar comprobante (PDF)</button>`);
     const w2=add("m dots","<span></span><span></span><span></span>"),sent=await mailTicket(t);w2.remove();
     bot(sent?`Te enviamos el comprobante en PDF a ${u.email}. Revisa también tu carpeta de spam.`:"No pude enviar el comprobante a tu correo en este momento, pero puedes descargarlo con el botón de arriba.")}
    chips([S.flight?.a?"Cómo llegar al aeropuerto":"Cómo llegar","Planear otro viaje"]);save()},1400)}

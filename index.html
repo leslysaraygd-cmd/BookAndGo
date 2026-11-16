@@ -202,7 +202,7 @@ body:not(.logged) .auth-only,body:not(.logged) .fab{display:none!important}
   <a class="on"><i data-lucide="home"></i> Inicio</a>
   <a href="explorar.html"><i data-lucide="compass"></i> Explorar</a>
   <a href="itinerarios.html"><i data-lucide="map"></i> Itinerarios</a>
-  <a class="auth-only" id="nTrips"><i data-lucide="briefcase"></i> Mis Viajes</a>
+  <a class="auth-only" id="nTrips" href="misviajes.html"><i data-lucide="briefcase"></i> Mis Viajes</a>
   <a><i data-lucide="star"></i> Opiniones</a>
   <a class="auth-only" id="nProf"><i data-lucide="user"></i> Perfil</a>
   <a><i data-lucide="settings"></i> Configuración</a>
@@ -260,7 +260,6 @@ body:not(.logged) .auth-only,body:not(.logged) .fab{display:none!important}
         <div><div class="ico"><i data-lucide="shield-check"></i></div><h4>Viaje seguro</h4><p>Recomendaciones 100% confiables y soporte 24/7 durante toda tu aventura.</p></div>
       </div>
     </div>
-    <div class="ops auth-only" id="trips" style="margin:90px 0 0"><header><h3>Mis viajes</h3><button class="outline" id="tripsBtn">✨ Crear mi viaje</button></header><div class="grid"><div class="empty">Aún no tienes viajes guardados. ¡Crea el primero con la IA! 🧳</div></div></div>
     <div class="ops">
       <header><h3>Lo que dicen nuestros viajeros</h3><button class="outline" id="addop">Dejar mi opinión ✎</button></header>
       <div id="ops" class="load">Cargando opiniones…</div>
@@ -502,8 +501,6 @@ $("pfForm").onsubmit=async e=>{e.preventDefault();const u=auth.currentUser,n=$("
 // ---- Proteger secciones ----
 window.gate=(fn,txt)=>{if(document.body.classList.contains("logged"))return fn();after=fn;view("fLogin");msg(txt,1);dlg.showModal()};
 $("nProf").onclick=()=>$("pfm").showModal();
-$("nTrips").onclick=()=>$("trips").scrollIntoView({behavior:"smooth"});
-$("tripsBtn").onclick=()=>$("create").click();
 const q=new URLSearchParams(location.search);
 if(q.has("reservar")){const id=q.get("reservar");history.replaceState(null,"",location.pathname);after=()=>{preset();openChat();pickDest(id)};pend="Inicia sesión para reservar tu viaje ✨"}
 if(q.has("itinerario")){const id=q.get("itinerario");history.replaceState(null,"",location.pathname);after=async()=>{try{const u=auth.currentUser,s=await get(ref(db,`itinerarios/${u.uid}/${id}`));if(s.exists()){openChat();loadItin(s.val(),id)}}catch{}};pend="Inicia sesión para ver tu itinerario ✨"}
